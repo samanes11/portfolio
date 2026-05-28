@@ -1,65 +1,238 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect, useCallback } from "react";
+import LoginScreen from "@/components/LoginScreen";
+import Taskbar from "@/components/Taskbar";
+import StartMenu from "@/components/StartMenu";
+import DesktopIcon from "@/components/DesktopIcon";
+import Notification from "@/components/Notification";
+import AboutWindow from "@/components/windows/AboutWindow";
+import ProjectsWindow from "@/components/windows/ProjectsWindow";
+import ResumeWindowPC from "@/components/windows/ResumeWindowPC";
+import ResumeWindowMobile from "@/components/windows/ResumeWindowMobile";
+import ContactWindow from "@/components/windows/ContactWindow";
+import GameWindow from "@/components/windows/GameWindow";
+import MediaPlayerWindow from "@/components/windows/MediaPlayerWindow";
+import ControlPanel from "@/components/admin/ControlPanel";
+
+type WindowId =
+  | "about"
+  | "projects"
+  | "resume"
+  | "contact"
+  | "game"
+  | "mediaplayer"
+  | "AI Terminal"
+  | "controlPanel";
+
+const desktopIcons: { id: WindowId; icon: string; label: string }[] = [
+  { id: "about",    icon: "icon-[octicon--person-fill-24]",               label: "About Me" },
+  { id: "projects", icon: "icon-[teenyicons--folder-solid]",              label: "Projects" },
+  { id: "resume",   icon: "icon-[material-symbols--description-rounded]", label: "Resume" },
+  { id: "contact",  icon: "icon-[ic--baseline-email]",                    label: "Contact" },
+];
+
+export default function PortfolioPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin]       = useState(false);
+
+  const [openWindows, setOpenWindows]           = useState<Set<WindowId>>(new Set());
+  const [minimizedWindows, setMinimizedWindows] = useState<WindowId[]>([]);
+  const [activeWindow, setActiveWindow]         = useState<WindowId | null>(null);
+
+  const [startMenuOpen, setStartMenuOpen]       = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [selectedIcon, setSelectedIcon]         = useState<string | null>(null);
+  const [mediaFilterProjectId, setMediaFilterProjectId] = useState<string | null>(null);
+
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+  );
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const tick = setInterval(() => {
+      setCurrentTime(
+        new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+      );
+    }, 1000);
+    return () => clearInterval(tick);
+  }, []);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const show = setTimeout(() => setShowNotification(true),  7_000);
+    const hide = setTimeout(() => setShowNotification(false), 19_000);
+    return () => { clearTimeout(show); clearTimeout(hide); };
+  }, [isLoggedIn]);
+
+  const openWindow = useCallback((id: string) => {
+    const wid = id as WindowId;
+    setOpenWindows((prev) => new Set(prev).add(wid));
+    setMinimizedWindows((prev) => prev.filter((w) => w !== wid));
+    setActiveWindow(wid);
+    setStartMenuOpen(false);
+  }, []);
+
+  const closeWindow = useCallback((id: WindowId) => {
+    setOpenWindows((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setMinimizedWindows((prev) => prev.filter((w) => w !== id));
+    setActiveWindow((prev) => (prev === id ? null : prev));
+  }, []);
+
+  const minimizeWindow = useCallback((id: WindowId) => {
+    setMinimizedWindows((prev) => prev.includes(id) ? prev : [...prev, id]);
+    setOpenWindows((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setActiveWindow((prev) => (prev === id ? null : prev));
+  }, []);
+
+  const handleTaskbarClick = useCallback((id: string) => {
+    const wid = id as WindowId;
+    if (minimizedWindows.includes(wid)) {
+      openWindow(wid);
+    } else if (openWindows.has(wid)) {
+      minimizeWindow(wid);
+    } else {
+      openWindow(wid);
+    }
+  }, [minimizedWindows, openWindows, openWindow, minimizeWindow]);
+
+  if (!isLoggedIn) {
+    return (
+      <LoginScreen
+        onLogin={() => setIsLoggedIn(true)}
+        onAdminLogin={() => {
+          setIsLoggedIn(true);
+          setIsAdmin(true);
+          openWindow("controlPanel");
+        }}
+      />
+    );
+  }
+
+  // ── همه پنجره‌ها برای taskbar: open + minimized بدون تکرار ──────────────
+  const allOpenForTaskbar = [
+    ...Array.from(openWindows),
+    ...minimizedWindows,
+  ].filter((v, i, a) => a.indexOf(v) === i);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div
+      className="min-h-screen bg-cover bg-center relative pb-16"
+      style={{ backgroundImage: "url(/437.jpg)", backgroundSize: "cover", direction: "ltr" }}
+      onClick={() => setSelectedIcon(null)}
+    >
+      {/* Desktop Icons */}
+      <div className="p-5 flex flex-col gap-4 w-fit" onClick={(e) => e.stopPropagation()}>
+        {desktopIcons.map(({ id, icon, label }) => (
+          <DesktopIcon
+            key={id}
+            id={id}
+            icon={<span className={`${icon} w-[26px] h-[26px]`} />}
+            label={label}
+            onOpen={(wid) => openWindow(wid)}
+            isSelected={selectedIcon === id}
+            onSelect={(wid) => setSelectedIcon(wid)}
+          />
+        ))}
+      </div>
+
+      {/* Windows */}
+      {openWindows.has("about") && (
+        <AboutWindow
+          onClose={() => closeWindow("about")}
+          onMinimize={() => minimizeWindow("about")}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
+
+      {openWindows.has("projects") && (
+        <ProjectsWindow
+          onClose={() => closeWindow("projects")}
+          onMinimize={() => minimizeWindow("projects")}
+          onOpenMediaPlayer={(projectId) => {
+            setMediaFilterProjectId(projectId);
+            openWindow("mediaplayer");
+          }}
+        />
+      )}
+
+      {openWindows.has("resume") && (
+        isMobile
+          ? <ResumeWindowMobile onClose={() => closeWindow("resume")} onMinimize={() => minimizeWindow("resume")} />
+          : <ResumeWindowPC     onClose={() => closeWindow("resume")} onMinimize={() => minimizeWindow("resume")} />
+      )}
+
+      {openWindows.has("contact") && (
+        <ContactWindow
+          onClose={() => closeWindow("contact")}
+          onMinimize={() => minimizeWindow("contact")}
+        />
+      )}
+
+      {openWindows.has("game") && (
+        <GameWindow
+          onClose={() => closeWindow("game")}
+          onMinimize={() => minimizeWindow("game")}
+        />
+      )}
+
+      {openWindows.has("mediaplayer") && (
+        <MediaPlayerWindow
+          onClose={() => closeWindow("mediaplayer")}
+          onMinimize={() => minimizeWindow("mediaplayer")}
+          filterProjectId={mediaFilterProjectId}
+          onClearFilter={() => setMediaFilterProjectId(null)}
+        />
+      )}
+
+      {openWindows.has("controlPanel") && isAdmin && (
+        <ControlPanel
+          onClose={() => closeWindow("controlPanel")}
+          onMinimize={() => minimizeWindow("controlPanel")}
+        />
+      )}
+
+      {/* Notification */}
+      {showNotification && (
+        <Notification
+          onClose={() => setShowNotification(false)}
+          onAboutClick={() => openWindow("about")}
+          onProjectsClick={() => openWindow("projects")}
+        />
+      )}
+
+      {/* Start Menu */}
+      {startMenuOpen && (
+        <StartMenu
+          onItemClick={(id) => openWindow(id)}
+          onClose={() => setStartMenuOpen(false)}
+        />
+      )}
+
+      {/* Taskbar — openWindows پاس داده میشه */}
+      <Taskbar
+        openWindows={allOpenForTaskbar}        // ← اضافه شد
+        minimizedWindows={minimizedWindows}
+        activeWindow={activeWindow}
+        onOpenWindow={handleTaskbarClick}
+        onToggleStart={() => setStartMenuOpen((o) => !o)}
+        currentTime={currentTime}
+      />
     </div>
   );
 }
