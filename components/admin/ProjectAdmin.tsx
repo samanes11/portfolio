@@ -19,45 +19,63 @@ interface Props {
   onBack: () => void;
 }
 
-// ── Form Field ────────────────────────────────────────────────────────────────
+// Form Field
 
-function FormField({ label, value, onChange, placeholder, disabled, type = "text" }: {
-  label: string; value: string; onChange?: (v: string) => void;
-  placeholder?: string; disabled?: boolean; type?: string;
+function FormField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange?: (v: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  type?: string;
 }) {
   return (
     <div className="flex flex-col gap-1 w-full">
-      <label className="text-gray-700 font-bold text-sm">{label}</label>
+      <label className="text-slate-400 font-bold text-sm">{label}</label>
       <input
-        type={type} disabled={disabled} value={value}
+        type={type}
+        disabled={disabled}
+        value={value}
         placeholder={placeholder}
         onChange={(e) => onChange?.(e.target.value)}
         className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-amber-500 transition-colors disabled:opacity-60"
-        style={{ color: "#374151", fontWeight: 700, fontSize: 13 }}
+        style={{ color: "#A5ADB9", fontWeight: 700, fontSize: 13 }}
       />
     </div>
   );
 }
 
-// ── Add / Edit modal ──────────────────────────────────────────────────────────
+//Add / Edit modal 
 
-function ProjectModal({ initial, onSave, onClose }: {
+function ProjectModal({
+  initial,
+  onSave,
+  onClose,
+}: {
   initial?: Project | null;
   onSave: (p: Partial<Project>) => Promise<void>;
   onClose: () => void;
 }) {
   const isEdit = !!initial;
   const [form, setForm] = useState({
-    id:       initial?.id       ?? "",
-    name:     initial?.name     ?? "",
-    date:     initial?.date     ?? "",
+    id: initial?.id ?? "",
+    name: initial?.name ?? "",
+    date: initial?.date ?? "",
     platform: initial?.platform ?? "",
-    tech:     initial?.tech     ?? "",
-    desc:     initial?.desc     ?? "",
+    tech: initial?.tech ?? "",
+    desc: initial?.desc ?? "",
   });
   const [saving, setSaving] = useState(false);
 
-  const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: keyof typeof form) => (v: string) =>
+    setForm((f) => ({ ...f, [k]: v }));
 
   async function submit() {
     if (!form.id || !form.name) {
@@ -77,31 +95,83 @@ function ProjectModal({ initial, onSave, onClose }: {
 
   return (
     <>
-      <div className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
       <div className="fixed inset-0 z-[1101] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm rounded-2xl shadow-2xl border border-white/10 overflow-hidden" style={{ background: "linear-gradient(135deg,#1e1e2c,#232838)" }}>
+        <div
+          className="w-full max-w-sm rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
+          style={{ background: "linear-gradient(135deg,#1e1e2c,#232838)" }}
+        >
           <div className="flex items-center justify-between px-4 py-2 bg-black/30 border-b border-white/10">
-            <span className="text-white/70 text-xs font-mono">{isEdit ? "Edit Project" : "Add New Project"}</span>
-            <button onClick={onClose} className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400" />
+            <span className="text-white/70 text-xs font-mono">
+              {isEdit ? "Edit Project" : "Add New Project"}
+            </span>
+            <button
+              onClick={onClose}
+              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400"
+            />
           </div>
           <div className="flex flex-col gap-4 p-5" style={{ direction: "ltr" }}>
-            <FormField label="ID" value={form.id} onChange={isEdit ? undefined : set("id")} disabled={isEdit} placeholder="menu" />
-            <FormField label="Name" value={form.name} onChange={set("name")} placeholder="Coffee Shop Menu" />
-            <FormField label="Date" value={form.date} onChange={set("date")} placeholder="2025" />
-            <FormField label="Platform" value={form.platform} onChange={set("platform")} placeholder="Mobile" />
-            <FormField label="Tech" value={form.tech} onChange={set("tech")} placeholder="Flutter, Dart" />
+            <FormField
+              label="ID"
+              value={form.id}
+              onChange={isEdit ? undefined : set("id")}
+              disabled={isEdit}
+              placeholder="menu"
+            />
+            <FormField
+              label="Name"
+              value={form.name}
+              onChange={set("name")}
+              placeholder="Coffee Shop Menu"
+            />
+            <FormField
+              label="Date"
+              value={form.date}
+              onChange={set("date")}
+              placeholder="2025"
+            />
+            <FormField
+              label="Platform"
+              value={form.platform}
+              onChange={set("platform")}
+              placeholder="Mobile"
+            />
+            <FormField
+              label="Tech"
+              value={form.tech}
+              onChange={set("tech")}
+              placeholder="Flutter, Dart"
+            />
             <div className="flex flex-col gap-1">
-              <label className="text-gray-300 font-bold text-sm">Description</label>
+              <label className="text-gray-300 font-bold text-sm">
+                Description
+              </label>
               <textarea
-                rows={4} value={form.desc} placeholder="Project description..."
-                onChange={(e) => setForm((f) => ({ ...f, desc: e.target.value }))}
+                rows={4}
+                value={form.desc}
+                placeholder="Project description..."
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, desc: e.target.value }))
+                }
                 className="w-full rounded-lg border border-white/20 px-3 py-2 text-sm outline-none focus:border-amber-500 resize-none text-gray-300"
                 style={{ background: "rgba(255,255,255,0.05)" }}
               />
             </div>
             <div className="flex gap-3">
-              <button onClick={onClose} className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors">Cancel</button>
-              <button onClick={submit} disabled={saving} className="flex-1 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-mono font-bold transition-colors disabled:opacity-50">
+              <button
+                onClick={onClose}
+                className="btn btn-ghost flex-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submit}
+                disabled={saving}
+                className="btn btn-ghost flex-1 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-mono font-bold transition-colors disabled:opacity-50"
+              >
                 {saving ? "Saving..." : isEdit ? "Save Changes" : "Add Project"}
               </button>
             </div>
@@ -112,23 +182,52 @@ function ProjectModal({ initial, onSave, onClose }: {
   );
 }
 
-// ── Confirm delete modal ──────────────────────────────────────────────────────
+// Confirm delete modal 
 
-function ConfirmModal({ onConfirm, onClose }: { onConfirm: () => void; onClose: () => void }) {
+function ConfirmModal({
+  onConfirm,
+  onClose,
+}: {
+  onConfirm: () => void;
+  onClose: () => void;
+}) {
   return (
     <>
-      <div className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
       <div className="fixed inset-0 z-[1101] flex items-center justify-center p-4">
-        <div className="w-[250px] rounded-2xl shadow-2xl border border-white/10 overflow-hidden" style={{ background: "#1e1e2c" }}>
+        <div
+          className="w-[250px] rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
+          style={{ background: "#1e1e2c" }}
+        >
           <div className="flex items-center justify-between px-4 py-2 bg-black/30 border-b border-white/10">
-            <span className="text-white/70 text-xs font-mono">Confirm Delete</span>
-            <button onClick={onClose} className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400" />
+            <span className="text-white/70 text-xs font-mono">
+              Confirm Delete
+            </span>
+            <button
+              onClick={onClose}
+              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400"
+            />
           </div>
-          <div className="flex flex-col items-center gap-4 p-5" style={{ direction: "ltr" }}>
+          <div
+            className="flex flex-col items-center gap-4 p-5"
+            style={{ direction: "ltr" }}
+          >
             <span className="icon-[mdi--alert-circle] w-14 h-14 text-red-500" />
-            <p className="text-gray-300 text-center text-sm">Are you sure you want to delete this project?</p>
-            <p className="text-gray-500 text-center text-xs">This action cannot be undone.</p>
-            <button onClick={onConfirm} className="w-full py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono font-bold transition-colors">Delete</button>
+            <p className="text-gray-300 text-center text-sm">
+              Are you sure you want to delete this project?
+            </p>
+            <p className="text-gray-500 text-center text-xs">
+              This action cannot be undone.
+            </p>
+            <button
+              onClick={onConfirm}
+              className="w-full py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono font-bold transition-colors"
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
@@ -136,9 +235,13 @@ function ConfirmModal({ onConfirm, onClose }: { onConfirm: () => void; onClose: 
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// Main component 
 
-export default function AdminProjectManagement({ onClose, onMinimize, onBack }: Props) {
+export default function AdminProjectManagement({
+  onClose,
+  onMinimize,
+  onBack,
+}: Props) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<"add" | "edit" | "delete" | null>(null);
@@ -156,18 +259,25 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function handleSave(form: Partial<Project>) {
     const isEdit = !!selected;
-    const res = await fetch(`/api/system/${isEdit ? "updateProject" : "addProject"}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const res = await fetch(
+      `/api/system/${isEdit ? "updateProject" : "addProject"}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      },
+    );
     const data = await res.json();
     if (!data.success) throw new Error(data.msg || "Failed");
-    toast.success(isEdit ? "Project updated successfully!" : "Project added successfully!");
+    toast.success(
+      isEdit ? "Project updated successfully!" : "Project added successfully!",
+    );
     load();
   }
 
@@ -194,23 +304,43 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
 
   return (
     <>
-      <WindowFloat onclose={onClose} onminimize={onMinimize} showMinimize padding={0} maxWidth="140vh" title="Project Management"
-        contentStyle={{ background: "linear-gradient(135deg,#1a1a1a,#2d2d2d)", height: "70vh" }}
+      <WindowFloat
+        onclose={onClose}
+        onminimize={onMinimize}
+        showMinimize
+        padding={0}
+        maxWidth="140vh"
+        title="Project Management"
+        contentStyle={{
+          background: "linear-gradient(135deg,#1a1a1a,#2d2d2d)",
+          height: "70vh",
+        }}
       >
         <div className="flex flex-col h-full" style={{ direction: "ltr" }}>
           {/* Header */}
           <div className="flex flex-row items-center flex-wrap sm:flex-nowrap gap-3 px-3 sm:px-6 py-3 sm:py-4 bg-[#1e1e1e] border-b border-gray-700">
             <div className="flex flex-row items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <button onClick={onBack} className="text-white/80 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
+              <button
+                onClick={onBack}
+                className="text-white/80 hover:text-white p-1 rounded hover:bg-white/10 transition-colors"
+              >
                 <span className="icon-[mdi--arrow-left] w-5 h-5 sm:w-6 sm:h-6" />
               </button>
               <span className="icon-[mdi--folder-edit] w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               <div className="flex flex-col min-w-0">
-                <span className="text-white font-bold text-sm sm:text-lg truncate">Project Management</span>
-                <span className="text-white/70 text-xs truncate">Control Panel / Projects</span>
+                <span className="text-white font-bold text-sm sm:text-lg truncate">
+                  Project Management
+                </span>
+                <span className="text-white/70 text-xs truncate">
+                  Control Panel / Projects
+                </span>
               </div>
             </div>
-            <button onClick={() => { setSelected(null); setModal("add"); }}
+            <button
+              onClick={() => {
+                setSelected(null);
+                setModal("add");
+              }}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-mono transition-colors w-full sm:w-auto justify-center"
             >
               <span className="icon-[mdi--plus-circle] w-5 h-5" />
@@ -225,44 +355,77 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
                 <div className="w-8 h-8 border-4 border-gray-600 border-t-blue-500 rounded-full animate-spin" />
               </div>
             )}
-            {!loading && projects.map((project) => (
-              <div key={project.id} className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-white/10 hover:border-white/20 transition-all">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5">
-                  <div className="flex flex-row items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                    <span className="icon-[material-symbols--folder] w-[35px] h-[35px] text-amber-400 flex-shrink-0" />
-                    <div className="flex flex-col flex-1 min-w-0 gap-1">
-                      <span className="text-white font-semibold truncate text-sm sm:text-base">{project.name}</span>
-                      <div className="flex flex-wrap gap-1 sm:gap-2">
-                        {[`📅 ${project.date}`, `💻 ${project.platform}`, `🛠️ ${project.tech}`].map((tag) => (
-                          <span key={tag} className="text-gray-400 bg-gray-700/50 px-1.5 py-0.5 rounded text-xs">{tag}</span>
-                        ))}
+            {!loading &&
+              projects.map((project) => (
+                <div
+                  key={project.id}
+                  className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-white/10 hover:border-white/20 transition-all"
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5">
+                    <div className="flex flex-row items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                      <span className="icon-[material-symbols--folder] w-[35px] h-[35px] text-amber-400 flex-shrink-0" />
+                      <div className="flex flex-col flex-1 min-w-0 gap-1">
+                        <span className="text-white font-semibold truncate text-sm sm:text-base">
+                          {project.name}
+                        </span>
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                          {[
+                            `📅 ${project.date}`,
+                            `💻 ${project.platform}`,
+                            `🛠️ ${project.tech}`,
+                          ].map((tag) => (
+                            <span
+                              key={tag}
+                              className="text-gray-400 bg-gray-700/50 px-1.5 py-0.5 rounded text-xs"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        {project.desc && (
+                          <span className="text-gray-400 text-xs sm:text-sm line-clamp-2">
+                            {project.desc}
+                          </span>
+                        )}
                       </div>
-                      {project.desc && <span className="text-gray-400 text-xs sm:text-sm line-clamp-2">{project.desc}</span>}
+                    </div>
+                    <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
+                      <button
+                        onClick={() => {
+                          setSelected(project);
+                          setModal("edit");
+                        }}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-400 text-xs font-mono transition-colors border border-yellow-600/30"
+                      >
+                        <span className="icon-[mdi--pencil] w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelected(project);
+                          setModal("delete");
+                        }}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-mono transition-colors border border-red-600/30"
+                      >
+                        <span className="icon-[mdi--delete] w-4 h-4" /> Delete
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
-                    <button onClick={() => { setSelected(project); setModal("edit"); }}
-                      className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-400 text-xs font-mono transition-colors border border-yellow-600/30"
-                    >
-                      <span className="icon-[mdi--pencil] w-4 h-4" /> Edit
-                    </button>
-                    <button onClick={() => { setSelected(project); setModal("delete"); }}
-                      className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-mono transition-colors border border-red-600/30"
-                    >
-                      <span className="icon-[mdi--delete] w-4 h-4" /> Delete
-                    </button>
-                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </WindowFloat>
 
       {(modal === "add" || modal === "edit") && (
-        <ProjectModal initial={modal === "edit" ? selected : null} onSave={handleSave} onClose={() => setModal(null)} />
+        <ProjectModal
+          initial={modal === "edit" ? selected : null}
+          onSave={handleSave}
+          onClose={() => setModal(null)}
+        />
       )}
-      {modal === "delete" && <ConfirmModal onConfirm={handleDelete} onClose={() => setModal(null)} />}
+      {modal === "delete" && (
+        <ConfirmModal onConfirm={handleDelete} onClose={() => setModal(null)} />
+      )}
     </>
   );
 }

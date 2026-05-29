@@ -98,7 +98,7 @@ export default function ProjectsWindow({
     );
   }
 
-  // ── Project Detail View ──────────────────────────────────────────────────
+  // Project Detail View 
   if (selectedProject && project) {
     return (
       <WindowFloat
@@ -164,7 +164,7 @@ export default function ProjectsWindow({
     );
   }
 
-  // ── Project List ─────────────────────────────────────────────────────────
+  // Project List 
   return (
     <WindowFloat
       onclose={onClose}

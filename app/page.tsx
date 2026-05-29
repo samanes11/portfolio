@@ -27,34 +27,50 @@ type WindowId =
   | "controlPanel";
 
 const desktopIcons: { id: WindowId; icon: string; label: string }[] = [
-  { id: "about",    icon: "icon-[octicon--person-fill-24]",               label: "About Me" },
-  { id: "projects", icon: "icon-[teenyicons--folder-solid]",              label: "Projects" },
-  { id: "resume",   icon: "icon-[material-symbols--description-rounded]", label: "Resume" },
-  { id: "contact",  icon: "icon-[ic--baseline-email]",                    label: "Contact" },
+  { id: "about", icon: "icon-[octicon--person-fill-24]", label: "About Me" },
+  {
+    id: "projects",
+    icon: "icon-[teenyicons--folder-solid]",
+    label: "Projects",
+  },
+  {
+    id: "resume",
+    icon: "icon-[material-symbols--description-rounded]",
+    label: "Resume",
+  },
+  { id: "contact", icon: "icon-[ic--baseline-email]", label: "Contact" },
 ];
 
 export default function PortfolioPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin]       = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const [openWindows, setOpenWindows]           = useState<Set<WindowId>>(new Set());
+  const [openWindows, setOpenWindows] = useState<Set<WindowId>>(new Set());
   const [minimizedWindows, setMinimizedWindows] = useState<WindowId[]>([]);
-  const [activeWindow, setActiveWindow]         = useState<WindowId | null>(null);
+  const [activeWindow, setActiveWindow] = useState<WindowId | null>(null);
 
-  const [startMenuOpen, setStartMenuOpen]       = useState(false);
+  const [startMenuOpen, setStartMenuOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [selectedIcon, setSelectedIcon]         = useState<string | null>(null);
-  const [mediaFilterProjectId, setMediaFilterProjectId] = useState<string | null>(null);
+  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [mediaFilterProjectId, setMediaFilterProjectId] = useState<
+    string | null
+  >(null);
 
   const [currentTime, setCurrentTime] = useState(
-    new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+    new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
   );
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const tick = setInterval(() => {
       setCurrentTime(
-        new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+        new Date().toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       );
     }, 1000);
     return () => clearInterval(tick);
@@ -69,9 +85,12 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    const show = setTimeout(() => setShowNotification(true),  7_000);
+    const show = setTimeout(() => setShowNotification(true), 7_000);
     const hide = setTimeout(() => setShowNotification(false), 19_000);
-    return () => { clearTimeout(show); clearTimeout(hide); };
+    return () => {
+      clearTimeout(show);
+      clearTimeout(hide);
+    };
   }, [isLoggedIn]);
 
   const openWindow = useCallback((id: string) => {
@@ -93,7 +112,7 @@ export default function PortfolioPage() {
   }, []);
 
   const minimizeWindow = useCallback((id: WindowId) => {
-    setMinimizedWindows((prev) => prev.includes(id) ? prev : [...prev, id]);
+    setMinimizedWindows((prev) => (prev.includes(id) ? prev : [...prev, id]));
     setOpenWindows((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -102,16 +121,19 @@ export default function PortfolioPage() {
     setActiveWindow((prev) => (prev === id ? null : prev));
   }, []);
 
-  const handleTaskbarClick = useCallback((id: string) => {
-    const wid = id as WindowId;
-    if (minimizedWindows.includes(wid)) {
-      openWindow(wid);
-    } else if (openWindows.has(wid)) {
-      minimizeWindow(wid);
-    } else {
-      openWindow(wid);
-    }
-  }, [minimizedWindows, openWindows, openWindow, minimizeWindow]);
+  const handleTaskbarClick = useCallback(
+    (id: string) => {
+      const wid = id as WindowId;
+      if (minimizedWindows.includes(wid)) {
+        openWindow(wid);
+      } else if (openWindows.has(wid)) {
+        minimizeWindow(wid);
+      } else {
+        openWindow(wid);
+      }
+    },
+    [minimizedWindows, openWindows, openWindow, minimizeWindow],
+  );
 
   if (!isLoggedIn) {
     return (
@@ -134,11 +156,18 @@ export default function PortfolioPage() {
   return (
     <div
       className="min-h-screen bg-cover bg-center relative pb-16"
-      style={{ backgroundImage: "url(/437.jpg)", backgroundSize: "cover", direction: "ltr" }}
+      style={{
+        backgroundImage: "url(/437.png)",
+        backgroundSize: "cover",
+        direction: "ltr",
+      }}
       onClick={() => setSelectedIcon(null)}
     >
       {/* Desktop Icons */}
-      <div className="p-5 flex flex-col gap-4 w-fit" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="p-5 flex flex-col gap-4 w-fit"
+        onClick={(e) => e.stopPropagation()}
+      >
         {desktopIcons.map(({ id, icon, label }) => (
           <DesktopIcon
             key={id}
@@ -171,11 +200,18 @@ export default function PortfolioPage() {
         />
       )}
 
-      {openWindows.has("resume") && (
-        isMobile
-          ? <ResumeWindowMobile onClose={() => closeWindow("resume")} onMinimize={() => minimizeWindow("resume")} />
-          : <ResumeWindowPC     onClose={() => closeWindow("resume")} onMinimize={() => minimizeWindow("resume")} />
-      )}
+      {openWindows.has("resume") &&
+        (isMobile ? (
+          <ResumeWindowMobile
+            onClose={() => closeWindow("resume")}
+            onMinimize={() => minimizeWindow("resume")}
+          />
+        ) : (
+          <ResumeWindowPC
+            onClose={() => closeWindow("resume")}
+            onMinimize={() => minimizeWindow("resume")}
+          />
+        ))}
 
       {openWindows.has("contact") && (
         <ContactWindow

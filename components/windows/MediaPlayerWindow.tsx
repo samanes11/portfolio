@@ -21,8 +21,8 @@ interface MediaPlayerWindowProps {
 
 const categoryGradient: Record<string, string> = {
   MicroService: "from-green-400 via-green-700 to-green-800",
-  Web:          "from-yellow-300 via-yellow-600 to-yellow-500",
-  Mobile:       "from-orange-400 via-orange-500 to-orange-600",
+  Web: "from-yellow-300 via-yellow-600 to-yellow-500",
+  Mobile: "from-orange-400 via-orange-500 to-orange-600",
 };
 
 export default function MediaPlayerWindow({
@@ -38,7 +38,9 @@ export default function MediaPlayerWindow({
   useEffect(() => {
     fetch("/api/system/showMedia?p=media")
       .then((r) => r.json())
-      .then((data) => { if (data.data) setAllMedia(data.data); })
+      .then((data) => {
+        if (data.data) setAllMedia(data.data);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -47,7 +49,7 @@ export default function MediaPlayerWindow({
     ? allMedia.filter((m) => m.id === filterProjectId)
     : allMedia;
 
-  // ── Detail view ──────────────────────────────────────────────────────────
+  // Detail view
   if (selectedImage) {
     const img = allMedia.find((i) => i.id === selectedImage);
     if (!img) return null;
@@ -60,7 +62,9 @@ export default function MediaPlayerWindow({
         padding={0}
         maxWidth="160vh"
         title={img.title}
-        contentStyle={{ background: "linear-gradient(135deg, #0f0f0f, #1a1a1a)" }}
+        contentStyle={{
+          background: "linear-gradient(135deg, #0f0f0f, #1a1a1a)",
+        }}
       >
         <div style={{ direction: "ltr" }}>
           <div className="px-4 py-3 bg-[#1e1e1e] border-b border-gray-700">
@@ -73,7 +77,6 @@ export default function MediaPlayerWindow({
           </div>
           <div className="bg-black p-4 sm:p-8 flex items-center justify-center">
             <div className="relative max-w-5xl mx-auto w-full">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.image}
                 alt={img.title}
@@ -86,7 +89,7 @@ export default function MediaPlayerWindow({
     );
   }
 
-  // ── Grid view ────────────────────────────────────────────────────────────
+  // Grid view
   return (
     <WindowFloat
       onclose={onClose}
@@ -95,7 +98,7 @@ export default function MediaPlayerWindow({
       maxWidth="120vh"
       title="Media Player"
       contentStyle={{
-        background: "linear-gradient(135deg, rgba(15,15,15,0.95), rgba(26,26,26,0.95))",
+        background: "#242323",
       }}
     >
       <div style={{ direction: "ltr" }}>
@@ -103,7 +106,10 @@ export default function MediaPlayerWindow({
         {filterProjectId && (
           <div className="flex items-center gap-3 px-4 sm:px-6 py-2.5 bg-amber-500/10 border-b border-amber-500/20">
             <span className="icon-[material-symbols--filter-alt] w-4 h-4 text-amber-400" />
-            <span className="text-amber-300 sm:text-sm font-medium flex-1 truncate" style={{ fontSize: 12 }}>
+            <span
+              className="text-amber-300 sm:text-sm font-medium flex-1 truncate"
+              style={{ fontSize: 12 }}
+            >
               Showing screenshots for this project
             </span>
             {onClearFilter && (
@@ -130,7 +136,9 @@ export default function MediaPlayerWindow({
           {!loading && allMedia.length > 0 && media.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500">
               <span className="icon-[material-symbols--image-not-supported-outline] w-12 h-12" />
-              <span style={{ fontSize: 14 }}>No screenshots found for this project</span>
+              <span style={{ fontSize: 14 }}>
+                No screenshots found for this project
+              </span>
               {onClearFilter && (
                 <button
                   onClick={onClearFilter}
@@ -152,7 +160,6 @@ export default function MediaPlayerWindow({
                   className="group cursor-pointer"
                 >
                   <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-800 shadow-lg ring-2 ring-transparent group-hover:ring-pink-500/50 transition-all duration-300">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.thumbnail || img.image}
                       alt={img.title}
@@ -167,7 +174,8 @@ export default function MediaPlayerWindow({
                     {/* Category badge */}
                     <div
                       className={`absolute top-2 left-2 px-2.5 py-1 rounded-full bg-gradient-to-r ${
-                        categoryGradient[img.category] ?? "from-gray-400 to-gray-500"
+                        categoryGradient[img.category] ??
+                        "from-gray-400 to-gray-500"
                       } text-xs text-white font-semibold shadow-xl backdrop-blur-sm`}
                     >
                       {img.category}
@@ -175,11 +183,17 @@ export default function MediaPlayerWindow({
                   </div>
                   {/* Info */}
                   <div className="mt-3 px-1">
-                    <span className="text-white font-semibold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-orange-500 transition-all duration-300 line-clamp-1 text-sm sm:text-base block" style={{ fontSize: 15 }}>
+                    <span
+                      className="text-white font-semibold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-orange-500 transition-all duration-300 line-clamp-1 text-sm sm:text-base block"
+                      style={{ fontSize: 15 }}
+                    >
                       {img.title}
                     </span>
                     {img.description && (
-                      <span className="text-gray-400 line-clamp-2 mt-1 text-xs sm:text-sm block" style={{ fontSize: 13 }}>
+                      <span
+                        className="text-gray-400 line-clamp-2 mt-1 text-xs sm:text-sm block"
+                        style={{ fontSize: 13 }}
+                      >
                         {img.description}
                       </span>
                     )}

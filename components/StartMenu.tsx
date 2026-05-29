@@ -14,52 +14,113 @@ const socialLinks = [
     name: "GitHub",
     url: "https://qepal.com/i/ahPyU",
     icon: "icon-[bi--github]",
-    colorFrom: "from-gray-700/20", colorTo: "to-gray-900/20",
+    colorFrom: "from-gray-700/20",
+    colorTo: "to-gray-900/20",
     textColor: "text-gray-400",
-    hoverFrom: "group-hover:from-gray-700", hoverTo: "group-hover:to-gray-900",
+    hoverFrom: "group-hover:from-gray-700",
+    hoverTo: "group-hover:to-gray-900",
   },
   {
     name: "LinkedIn",
     url: "https://qepal.com/i/JUG6m",
     icon: "icon-[ri--linkedin-box-fill]",
-    colorFrom: "from-blue-600/20", colorTo: "to-blue-800/20",
+    colorFrom: "from-blue-600/20",
+    colorTo: "to-blue-800/20",
     textColor: "text-blue-400",
-    hoverFrom: "group-hover:from-blue-600", hoverTo: "group-hover:to-blue-800",
+    hoverFrom: "group-hover:from-blue-600",
+    hoverTo: "group-hover:to-blue-800",
   },
   {
     name: "Instagram",
     url: "https://qepal.com/i/SeTZB",
     icon: "icon-[basil--instagram-outline]",
-    colorFrom: "from-pink-500/20", colorTo: "to-purple-600/20",
+    colorFrom: "from-pink-500/20",
+    colorTo: "to-purple-600/20",
     textColor: "text-pink-400",
-    hoverFrom: "group-hover:from-pink-500", hoverTo: "group-hover:to-purple-600",
+    hoverFrom: "group-hover:from-pink-500",
+    hoverTo: "group-hover:to-purple-600",
   },
   {
     name: "Telegram",
     url: "https://qepal.com/i/oAb7x",
     icon: "icon-[bxl--telegram]",
-    colorFrom: "from-sky-400/20", colorTo: "to-blue-600/20",
+    colorFrom: "from-sky-400/20",
+    colorTo: "to-blue-600/20",
     textColor: "text-sky-400",
-    hoverFrom: "group-hover:from-sky-400", hoverTo: "group-hover:to-blue-600",
+    hoverFrom: "group-hover:from-sky-400",
+    hoverTo: "group-hover:to-blue-600",
   },
 ];
 
 const menuItems = [
-  { id: "about",       icon: "icon-[octicon--person-fill-24]",                   label: "About Me",    desc: "Personal information" },
-  { id: "projects",    icon: "icon-[teenyicons--folder-solid]",                   label: "Projects",    desc: "View my work" },
-  { id: "resume",      icon: "icon-[material-symbols--description-rounded]",      label: "Resume",      desc: "Experience & education" },
-  { id: "contact",     icon: "icon-[ic--baseline-email]",                         label: "Contact",     desc: "Get in touch" },
-  { id: "AI Terminal", icon: "icon-[eos-icons--terminal]",                        label: "AI Terminal", desc: "AI Assistant" },
+  {
+    id: "about",
+    icon: "icon-[octicon--person-fill-24]",
+    label: "About Me",
+    desc: "Personal information",
+  },
+  {
+    id: "projects",
+    icon: "icon-[teenyicons--folder-solid]",
+    label: "Projects",
+    desc: "View my work",
+  },
+  {
+    id: "resume",
+    icon: "icon-[material-symbols--description-rounded]",
+    label: "Resume",
+    desc: "Experience & education",
+  },
+  {
+    id: "contact",
+    icon: "icon-[ic--baseline-email]",
+    label: "Contact",
+    desc: "Get in touch",
+  },
+  // {
+  //   id: "AI Terminal",
+  //   icon: "icon-[eos-icons--terminal]",
+  //   label: "AI Terminal",
+  //   desc: "AI Assistant",
+  // },
 ];
 
 const recentApps = [
-  { name: "Steam",          icon: "icon-[cib--steam]",                                  color: "from-slate-700 to-slate-900" },
-  { name: "VS Code",        icon: "icon-[mdi--microsoft-visual-studio-code]",           color: "from-blue-500 to-blue-600" },
-  { name: "Spotify",        icon: "icon-[ri--spotify-fill]",                            color: "from-green-500 to-green-600" },
-  { name: "Figma",          icon: "icon-[streamline-logos--figma-logo-block]",          color: "from-purple-500 to-purple-600" },
-  { name: "Edge",           icon: "icon-[bi--browser-edge]",                            color: "from-[#0078D7] to-[#00A4EF]" },
-  { name: "Photoshop",      icon: "icon-[icon-park-solid--adobe-photoshop]",            color: "from-[#0F2027] to-[#203A43]" },
-  { name: "Android Studio", icon: "icon-[mdi--android-studio]",                        color: "from-emerald-600 to-teal-700" },
+  {
+    name: "Steam",
+    icon: "icon-[cib--steam]",
+    color: "from-slate-700 to-slate-900",
+  },
+  {
+    name: "VS Code",
+    icon: "icon-[mdi--microsoft-visual-studio-code]",
+    color: "from-blue-500 to-blue-600",
+  },
+  {
+    name: "Spotify",
+    icon: "icon-[ri--spotify-fill]",
+    color: "from-green-500 to-green-600",
+  },
+  {
+    name: "Figma",
+    icon: "icon-[streamline-logos--figma-logo-block]",
+    color: "from-purple-500 to-purple-600",
+  },
+  {
+    name: "Edge",
+    icon: "icon-[bi--browser-edge]",
+    color: "from-[#0078D7] to-[#00A4EF]",
+  },
+  {
+    name: "Photoshop",
+    icon: "icon-[icon-park-solid--adobe-photoshop]",
+    color: "from-[#0F2027] to-[#203A43]",
+  },
+  {
+    name: "Android Studio",
+    icon: "icon-[mdi--android-studio]",
+    color: "from-emerald-600 to-teal-700",
+  },
 ];
 
 export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
@@ -107,7 +168,10 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
                   <span className={`${item.icon} w-[22px] h-[22px]`} />
                 </div>
                 <div className="flex flex-col flex-1">
-                  <span className="text-white font-semibold" style={{ fontSize: 13 }}>
+                  <span
+                    className="text-white font-semibold"
+                    style={{ fontSize: 13 }}
+                  >
                     {item.label}
                   </span>
                   <span className="text-gray-400" style={{ fontSize: 10 }}>
@@ -171,7 +235,10 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
                 >
                   <span className={`${social.icon} w-[20px] h-[20px]`} />
                 </div>
-                <span className="text-white font-medium" style={{ fontSize: 12 }}>
+                <span
+                  className="text-white font-medium"
+                  style={{ fontSize: 12 }}
+                >
                   {social.name}
                 </span>
               </a>
@@ -186,8 +253,13 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
               {recentOpen && (
                 <div className="absolute bottom-full mb-1 left-0 bg-gradient-to-br from-amber-950/98 to-stone-900/98 backdrop-blur-xl rounded-xl w-[180px] p-1 shadow-xl border border-amber-900/30 z-10">
                   {recentApps.map((app, i) => (
-                    <div key={i} className="flex items-center gap-3 px-3 py-2 cursor-not-allowed">
-                      <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${app.color} shadow-lg flex items-center justify-center`}>
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 px-3 py-2 cursor-not-allowed"
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-lg bg-gradient-to-br ${app.color} shadow-lg flex items-center justify-center`}
+                      >
                         <span className={`${app.icon} w-4 h-4 text-white`} />
                       </div>
                       <span className="text-gray-300" style={{ fontSize: 10 }}>
@@ -201,8 +273,19 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
                 onClick={() => setRecentOpen((o) => !o)}
                 className="flex items-center justify-between px-4 py-2 hover:bg-white/10 cursor-pointer transition-all duration-300 rounded-xl w-[180px]"
               >
-                <span className="text-gray-200" style={{ fontSize: 11 }}>Recently Used</span>
-                <span className="text-gray-200 transition-transform duration-200" style={{ fontSize: 11, display: "inline-block", transform: recentOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▲</span>
+                <span className="text-gray-200" style={{ fontSize: 11 }}>
+                  Recently Used
+                </span>
+                <span
+                  className="text-gray-200 transition-transform duration-200"
+                  style={{
+                    fontSize: 11,
+                    display: "inline-block",
+                    transform: recentOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                >
+                  ▲
+                </span>
               </button>
             </div>
           </div>
@@ -216,11 +299,21 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
               onClick={() => window.location.reload()}
             >
               <span className="icon-[iconamoon--restart-bold] w-[20px] h-[20px] text-gray-200 group-hover:text-yellow-300 transition-colors" />
-              <span className="text-gray-200 font-medium" style={{ fontSize: 12 }}>restart</span>
+              <span
+                className="text-gray-200 font-medium"
+                style={{ fontSize: 12 }}
+              >
+                restart
+              </span>
             </button>
             <button className="flex-1 flex items-center justify-center gap-2 py-3 hover:bg-red-500/20 cursor-not-allowed transition-all duration-300 rounded-xl group">
               <span className="icon-[wpf--shutdown] w-[18px] h-[18px] text-gray-200 group-hover:text-red-600 transition-colors" />
-              <span className="text-gray-200 font-medium" style={{ fontSize: 12 }}>Shutdown</span>
+              <span
+                className="text-gray-200 font-medium"
+                style={{ fontSize: 12 }}
+              >
+                Shutdown
+              </span>
             </button>
           </div>
         </div>

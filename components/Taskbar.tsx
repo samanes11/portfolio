@@ -1,7 +1,9 @@
 "use client";
 
+import SystemTray from "./ui/SystemTray";
+
 interface TaskbarProps {
-  openWindows: string[];        // ← جدید: همه پنجره‌های باز (open + minimized)
+  openWindows: string[];
   minimizedWindows: string[];
   activeWindow: string | null;
   onOpenWindow: (id: string) => void;
@@ -16,19 +18,19 @@ const windowLabels: Record<string, string> = {
   contact: "Contact",
   game: "Game",
   mediaplayer: "Media Player",
-  "AI Terminal": "AI Terminal",
+  // "AI Terminal": "AI Terminal",
   controlPanel: "Control Panel",
 };
 
 const windowIcons: Record<string, string> = {
-  about:         "icon-[octicon--person-fill-24]",
-  projects:      "icon-[teenyicons--folder-solid]",
-  resume:        "icon-[material-symbols--description-rounded]",
-  contact:       "icon-[ic--baseline-email]",
-  game:          "icon-[solar--gameboy-bold]",
-  mediaplayer:   "icon-[material-symbols-light--smart-display]",
-  "AI Terminal": "icon-[eos-icons--terminal]",
-  controlPanel:  "icon-[mdi--shield-account]",
+  about: "icon-[octicon--person-fill-24]",
+  projects: "icon-[teenyicons--folder-solid]",
+  resume: "icon-[material-symbols--description-rounded]",
+  contact: "icon-[ic--baseline-email]",
+  game: "icon-[solar--gameboy-bold]",
+  mediaplayer: "icon-[material-symbols-light--smart-display]",
+  // "AI Terminal": "icon-[eos-icons--terminal]",
+  controlPanel: "icon-[mdi--shield-account]",
 };
 
 export default function Taskbar({
@@ -72,14 +74,19 @@ export default function Taskbar({
                   isActive
                     ? "bg-yellow-500 animate-pulse"
                     : isMinimized
-                    ? "bg-gray-600"
-                    : "bg-gray-400"
+                      ? "bg-gray-600"
+                      : "bg-gray-400"
                 }`}
               />
               {windowIcons[windowId] && (
-                <span className={`${windowIcons[windowId]} w-[18px] h-[18px] ${isMinimized ? "opacity-50" : ""}`} />
+                <span
+                  className={`${windowIcons[windowId]} w-[18px] h-[18px] ${isMinimized ? "opacity-50" : ""}`}
+                />
               )}
-              <span style={{ fontSize: 12 }} className={`font-medium ${isMinimized ? "opacity-50" : ""}`}>
+              <span
+                style={{ fontSize: 12 }}
+                className={`font-medium ${isMinimized ? "opacity-50" : ""}`}
+              >
                 {windowLabels[windowId] ??
                   windowId.charAt(0).toUpperCase() + windowId.slice(1)}
               </span>
@@ -87,15 +94,21 @@ export default function Taskbar({
           );
         })}
       </div>
+      {/* System Tray */}
+      <div className="flex items-center gap-1">
+        <SystemTray />
 
-      {/* Clock */}
-      <div className="flex items-center gap-2">
-        <div className="h-8 w-px bg-white/20" />
-        <button className="h-10 px-4 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 text-white shadow-lg transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-0.5">
-          <span className="font-mono font-semibold" style={{ fontSize: 13 }}>
+        <div className="h-8 w-px bg-white/20 mx-1" />
+
+        {/* Clock*/}
+        <button className="h-10 px-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center justify-center gap-0.5">
+          <span
+            className="font-mono font-semibold text-white"
+            style={{ fontSize: 12 }}
+          >
             {currentTime}
           </span>
-          <span className="text-gray-300" style={{ fontSize: 10 }}>
+          <span className="text-gray-400" style={{ fontSize: 9 }}>
             {new Date().toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",

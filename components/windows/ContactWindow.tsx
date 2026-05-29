@@ -51,13 +51,13 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
       title="Contact"
       contentStyle={{
         background:
-          "linear-gradient(135deg, rgba(72 73 77 / 0.82), rgba(35,29,49,0.82))",
+          "#2d2d2d",
       }}
     >
       <div className="flex flex-col gap-4" style={{ direction: "ltr" }}>
         {/* Name */}
         <div className="flex flex-col gap-1">
-          <label className="text-gray-900 font-bold" style={{ fontSize: 13 }}>
+          <label className="text-slate-400 font-bold" style={{ fontSize: 13 }}>
             Name
           </label>
           <input
@@ -66,13 +66,13 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-amber-500 transition-colors"
-            style={{ fontWeight: 1000, fontSize: 13, color: "#374151" }}
+            style={{ fontWeight: 1000, fontSize: 13 }}
           />
         </div>
 
         {/* Email */}
         <div className="flex flex-col gap-1">
-          <label className="text-gray-900 font-bold" style={{ fontSize: 13 }}>
+          <label className="text-slate-400 font-bold" style={{ fontSize: 13 }}>
             Email or Phone
           </label>
           <input
@@ -81,13 +81,13 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-amber-500 transition-colors"
-            style={{ fontWeight: 1000, fontSize: 13, color: "#374151" }}
+            style={{ fontWeight: 1000, fontSize: 13 }}
           />
         </div>
 
         {/* Message */}
         <div className="flex flex-col gap-1">
-          <label className="font-bold text-gray-900" style={{ fontWeight: 1000, fontSize: 13 }}>
+          <label className="font-bold text-slate-400" style={{ fontWeight: 1000, fontSize: 13 }}>
             Message
           </label>
           <textarea
@@ -100,7 +100,7 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
         </div>
 
         <button
-          className="w-full py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-semibold transition-colors disabled:opacity-50"
+          className="btn btn-ghost w-full rounded-lg bg-white/20 hover:bg-white/30 text-white font-semibold transition-colors disabled:opacity-50"
           onClick={handleSend}
           disabled={loading}
         >
