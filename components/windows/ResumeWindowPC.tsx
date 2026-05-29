@@ -9,22 +9,22 @@ interface ResumeWindowPCProps {
 }
 
 export default function ResumeWindowPC({ onClose, onMinimize }: ResumeWindowPCProps) {
-  const handlePrint = async () => {
-    const url = "https://qepal.com/i/uVM5n";
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Connection failed");
-      const blob = await res.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "SamanResume.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (e) {
-      alert(`Download failed: ${e}`);
-    }
-  };
+  // const handlePrint = async () => {
+  //   const url = "https://qepal.com/i/uVM5n";
+  //   try {
+  //     const res = await fetch(url);
+  //     if (!res.ok) throw new Error("Connection failed");
+  //     const blob = await res.blob();
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(blob);
+  //     link.download = "SamanResume.pdf";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } catch (e) {
+  //     alert(`Download failed: ${e}`);
+  //   }
+  // };
 
   return (
     <WindowFloat
@@ -156,14 +156,14 @@ export default function ResumeWindowPC({ onClose, onMinimize }: ResumeWindowPCPr
         </div>
 
         {/* Download button */}
-        <div style={{ marginTop: 20, paddingLeft: 30 }}>
+        {/* <div style={{ marginTop: 20, paddingLeft: 30 }}>
           <button
             onClick={handlePrint}
             className="px-6 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-700 transition-colors font-mono text-sm"
           >
             Download PDF
           </button>
-        </div>
+        </div> */}
       </div>
     </WindowFloat>
   );
