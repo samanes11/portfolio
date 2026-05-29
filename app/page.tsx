@@ -14,6 +14,7 @@ import ContactWindow from "@/components/windows/ContactWindow";
 import GameWindow from "@/components/windows/GameWindow";
 import MediaPlayerWindow from "@/components/windows/MediaPlayerWindow";
 import ControlPanel from "@/components/admin/ControlPanel";
+import { ToastContainer } from "@/components/ui/Toast";
 
 type WindowId =
   | "about"
@@ -125,7 +126,6 @@ export default function PortfolioPage() {
     );
   }
 
-  // ── همه پنجره‌ها برای taskbar: open + minimized بدون تکرار ──────────────
   const allOpenForTaskbar = [
     ...Array.from(openWindows),
     ...minimizedWindows,
@@ -224,15 +224,18 @@ export default function PortfolioPage() {
         />
       )}
 
-      {/* Taskbar — openWindows پاس داده میشه */}
+      {/* Taskbar */}
       <Taskbar
-        openWindows={allOpenForTaskbar}        // ← اضافه شد
+        openWindows={allOpenForTaskbar}
         minimizedWindows={minimizedWindows}
         activeWindow={activeWindow}
         onOpenWindow={handleTaskbarClick}
         onToggleStart={() => setStartMenuOpen((o) => !o)}
         currentTime={currentTime}
       />
+
+      {/* Global Toast Container */}
+      <ToastContainer />
     </div>
   );
 }

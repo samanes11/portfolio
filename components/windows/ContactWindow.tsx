@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import WindowFloat from "../ui/WindowFloat";
+import { toast } from "../ui/Toast";
 
 interface ContactWindowProps {
   onClose: () => void;
@@ -12,16 +13,14 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [statusMsg, setStatusMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
     if (!name || !email || !message) {
-      setStatus("error");
-      setStatusMsg("All fields are required");
+      toast.error("All fields are required");
       return;
     }
-    setStatus("loading");
+    setLoading(true);
     try {
       const res = await fetch("/api/system/msg", {
         method: "POST",
@@ -30,16 +29,15 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
       });
       const data = await res.json();
       if (data.success) {
-        setStatus("success");
-        setStatusMsg("Message sent!");
+        toast.success("Message sent successfully!");
         setName(""); setEmail(""); setMessage("");
       } else {
-        setStatus("error");
-        setStatusMsg(data.msg || "Failed to send message");
+        toast.error(data.msg || "Failed to send message");
       }
     } catch {
-      setStatus("error");
-      setStatusMsg("Network error");
+      toast.error("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,7 +87,7 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
 
         {/* Message */}
         <div className="flex flex-col gap-1">
-          <label className="font-bold text-gray-900 " style={{ fontWeight: 1000, fontSize: 13 }}>
+          <label className="font-bold text-gray-900" style={{ fontWeight: 1000, fontSize: 13 }}>
             Message
           </label>
           <textarea
@@ -101,21 +99,12 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
           />
         </div>
 
-        {/* Status */}
-        {status !== "idle" && status !== "loading" && (
-          <span
-            className={status === "success" ? "text-green-600 text-sm" : "text-red-500 text-sm"}
-          >
-            {statusMsg}
-          </span>
-        )}
-
         <button
           className="w-full py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-semibold transition-colors disabled:opacity-50"
           onClick={handleSend}
-          disabled={status === "loading"}
+          disabled={loading}
         >
-          {status === "loading" ? "Sending..." : "Send Message"}
+          {loading ? "Sending..." : "Send Message"}
         </button>
       </div>
     </WindowFloat>

@@ -5,26 +5,26 @@ export const metadata: Metadata = {
   title: "Saman Esmaellpour - Portfolio",
   description: "Full Stack Developer",
   alternates: {
-    canonical: "https://saman11.ir",
+    canonical: "https://es-saman.ir",
     languages: {
-      "fa": "https://saman11.ir/fa",
-      "en": "https://saman11.ir/en",
-      "x-default": "https://saman11.ir",
+      "fa": "https://es-saman.ir/fa",
+      "en": "https://es-saman.ir/en",
+      "x-default": "https://es-saman.ir",
     },
   },
   openGraph: {
     title: "Saman Esmaellpour - Portfolio",
     description: "Full Stack Developer",
-    images: ["https://cdn.qepal.com/qepal/qecircabs.webp"],
-    url: "https://saman11.ir",
+    // images: ["https://cdn.qepal.com/qepal/qecircabs.webp"],
+    url: "https://es-saman.ir",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Saman Esmaellpour - Portfolio",
     description: "Full Stack Developer",
-    images: ["https://cdn.qepal.com/qepal/qecircabs.webp"],
-    site: "@qepalcom",
+    // images: ["https://cdn.qepal.com/qepal/qecircabs.webp"],
+    // site: "@qepalcom",
   },
 };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import WindowFloat from "../ui/WindowFloat";
+import { toast } from "../ui/Toast";
 
 interface Project {
   id: string;
@@ -22,24 +23,12 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ── Modals ────────────────────────────────────────────────────────────────
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState<Project | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  // add form
   const [form, setForm] = useState({ id: "", name: "", date: "", platform: "", tech: "", desc: "" });
-  // edit form
   const [editForm, setEditForm] = useState({ name: "", date: "", platform: "", tech: "", desc: "" });
-
-  const [feedback, setFeedback] = useState<{ msg: string; ok: boolean } | null>(null);
-
-  const showMsg = (msg: string, ok = true) => {
-    setFeedback({ msg, ok });
-    setTimeout(() => setFeedback(null), 3000);
-  };
-
-  // ── Load ──────────────────────────────────────────────────────────────────
 
   const load = async () => {
     setLoading(true);
@@ -47,62 +36,84 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
       const res = await fetch("/api/system/showProject?p=cs");
       const data = await res.json();
       if (data.data) setProjects(data.data);
-    } catch { showMsg("Failed to load projects", false); }
-    finally { setLoading(false); }
+    } catch {
+      toast.error("Failed to load projects");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, []);
 
-  // ── Add ───────────────────────────────────────────────────────────────────
-
   const handleAdd = async () => {
-    if (!form.id || !form.name) { showMsg("ID and Name are required!", false); return; }
-    const res = await fetch("/api/system/addProject", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    }).then(r => r.json());
-    if (res.success) { showMsg("Project added successfully"); setAddModal(false); setForm({ id: "", name: "", date: "", platform: "", tech: "", desc: "" }); load(); }
-    else showMsg(res.msg || "Failed to add project", false);
+    if (!form.id || !form.name) {
+      toast.error("ID and Name are required!");
+      return;
+    }
+    try {
+      const res = await fetch("/api/system/addProject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }).then(r => r.json());
+      if (res.success) {
+        toast.success("Project added successfully!");
+        setAddModal(false);
+        setForm({ id: "", name: "", date: "", platform: "", tech: "", desc: "" });
+        load();
+      } else {
+        toast.error(res.msg || "Failed to add project");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    }
   };
-
-  // ── Edit ──────────────────────────────────────────────────────────────────
 
   const handleEdit = async () => {
     if (!editModal) return;
-    const res = await fetch("/api/system/updateProject", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: editModal.id, ...editForm }),
-    }).then(r => r.json());
-    if (res.success) { showMsg("Project updated successfully"); setEditModal(null); load(); }
-    else showMsg(res.msg || "Failed to update project", false);
+    try {
+      const res = await fetch("/api/system/updateProject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editModal.id, ...editForm }),
+      }).then(r => r.json());
+      if (res.success) {
+        toast.success("Project updated successfully!");
+        setEditModal(null);
+        load();
+      } else {
+        toast.error(res.msg || "Failed to update project");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    }
   };
-
-  // ── Delete ────────────────────────────────────────────────────────────────
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    const res = await fetch("/api/system/removeProject", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: deleteId }),
-    }).then(r => r.json());
-    if (res.success) { showMsg("Project deleted successfully"); setDeleteId(null); load(); }
-    else showMsg(res.msg || "Failed to delete project", false);
+    try {
+      const res = await fetch("/api/system/removeProject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: deleteId }),
+      }).then(r => r.json());
+      if (res.success) {
+        toast.success("Project deleted successfully!");
+        setDeleteId(null);
+        load();
+      } else {
+        toast.error(res.msg || "Failed to delete project");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    }
   };
-
-  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <>
       <WindowFloat
-        onclose={onClose}
-        onminimize={onMinimize}
-        showMinimize
-        padding={0}
-        maxWidth="140vh"
-        title="Project Management"
+        onclose={onClose} onminimize={onMinimize} showMinimize padding={0}
+        maxWidth="140vh" title="Project Management"
         contentStyle={{ background: "linear-gradient(135deg, #1a1a1a, #2d2d2d)", height: "70vh" }}
       >
         <div className="flex flex-col h-full" style={{ direction: "ltr" }}>
@@ -126,13 +137,6 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
               Add Project
             </button>
           </div>
-
-          {/* Feedback */}
-          {feedback && (
-            <div className={`mx-4 mt-3 px-4 py-2 rounded-lg text-sm font-medium ${feedback.ok ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"}`}>
-              {feedback.msg}
-            </div>
-          )}
 
           {/* List */}
           <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-[#1a1a1a]">
@@ -180,38 +184,31 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
         </div>
       </WindowFloat>
 
-      {/* ── Add Modal ──────────────────────────────────────────────────────── */}
+      {/* Add Modal */}
       {addModal && (
         <Modal title="Add New Project" onClose={() => setAddModal(false)}>
-          <FormFields
-            data={form}
-            onChange={(k, v) => setForm(prev => ({ ...prev, [k]: v }))}
-            showId
-          />
+          <FormFields data={form} onChange={(k, v) => setForm(prev => ({ ...prev, [k]: v }))} showId />
           <button onClick={handleAdd} className="w-full py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold mt-2 transition-colors">
             Add Project
           </button>
         </Modal>
       )}
 
-      {/* ── Edit Modal ─────────────────────────────────────────────────────── */}
+      {/* Edit Modal */}
       {editModal && (
         <Modal title="Edit Project" onClose={() => setEditModal(null)}>
           <div className="flex flex-col gap-1 mb-3">
             <label className="text-gray-400 text-xs font-mono">ID (Cannot be changed)</label>
             <input value={editModal.id} disabled className="w-full rounded-lg px-3 py-2 text-sm bg-white/5 text-gray-500 border border-white/10 opacity-60" />
           </div>
-          <FormFields
-            data={editForm}
-            onChange={(k, v) => setEditForm(prev => ({ ...prev, [k]: v }))}
-          />
+          <FormFields data={editForm} onChange={(k, v) => setEditForm(prev => ({ ...prev, [k]: v }))} />
           <button onClick={handleEdit} className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold mt-2 transition-colors">
             Save Changes
           </button>
         </Modal>
       )}
 
-      {/* ── Delete Confirm ─────────────────────────────────────────────────── */}
+      {/* Delete Confirm */}
       {deleteId && (
         <Modal title="Confirm Delete" onClose={() => setDeleteId(null)} maxWidth="300px">
           <div className="flex flex-col items-center gap-3 py-2">

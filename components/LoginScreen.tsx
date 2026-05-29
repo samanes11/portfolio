@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ToastContainer, toast } from "./ui/Toast";
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -14,27 +15,36 @@ export default function LoginScreen({
 }: LoginScreenProps) {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
-  // const handleAdminSubmit = async () => {
-  //   try {
-  //     const res = await fetch("/api/system/checkPass", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ pass: password }),
-  //     });
-  //     const data = await res.json();
-  //     if (data.success) {
-  //       setShowAdminModal(false);
-  //       setPassword("");
-  //       onAdminLogin();
-  //     } else {
-  //       setError("Incorrect password");
-  //     }
-  //   } catch {
-  //     setError("Connection error");
-  //   }
-  // };
+  const handleAdminSubmit = async () => {
+    if (!password) {
+      toast.error("Please enter a password");
+      return;
+    }
+    try {
+      const res = await fetch("/api/system/checkPass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pass: password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Welcome, Admin!");
+        setShowAdminModal(false);
+        setPassword("");
+        setTimeout(() => onAdminLogin(), 600);
+      } else {
+        toast.error("Incorrect password. Try again.");
+      }
+    } catch {
+      toast.error("Connection error. Please try again.");
+    }
+  };
+
+  const closeModal = () => {
+    setShowAdminModal(false);
+    setPassword("");
+  };
 
   return (
     <>
@@ -134,11 +144,7 @@ export default function LoginScreen({
         <>
           <div
             className="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm"
-            onClick={() => {
-              setShowAdminModal(false);
-              setError("");
-              setPassword("");
-            }}
+            onClick={closeModal}
           />
           <div className="fixed inset-0 z-[1001] flex items-center justify-center">
             <div
@@ -155,11 +161,7 @@ export default function LoginScreen({
                   admin login
                 </span>
                 <button
-                  onClick={() => {
-                    setShowAdminModal(false);
-                    setError("");
-                    setPassword("");
-                  }}
+                  onClick={closeModal}
                   className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400"
                 />
               </div>
@@ -175,11 +177,8 @@ export default function LoginScreen({
                   <input
                     type="password"
                     value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setError("");
-                    }}
-                    // onKeyDown={(e) => e.key === "Enter" && handleAdminSubmit()}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAdminSubmit()}
                     className="w-full rounded-lg px-3 py-2 text-sm font-mono outline-none border border-white/20 focus:border-amber-500/60 transition-colors"
                     style={{
                       background:
@@ -191,30 +190,18 @@ export default function LoginScreen({
                     autoFocus
                     placeholder="Enter password..."
                   />
-                  {error && (
-                    <span className="text-red-400 text-xs mt-1">{error}</span>
-                  )}
                 </div>
 
                 <div className="flex gap-3 w-full">
                   <button
                     className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
-                    onClick={() => {
-                      setShowAdminModal(false);
-                      setError("");
-                      setPassword("");
-                    }}
+                    onClick={closeModal}
                   >
                     Cancel
                   </button>
                   <button
                     className="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-mono font-bold transition-colors"
-                    // onClick={handleAdminSubmit}
-                    onClick={() => {
-                      setShowAdminModal(false);
-                      setPassword("");
-                      onAdminLogin();
-                    }}
+                    onClick={handleAdminSubmit}
                   >
                     Login
                   </button>
@@ -225,137 +212,76 @@ export default function LoginScreen({
         </>
       )}
 
+      {/* Toast lives here for the login screen (before page.tsx mounts) */}
+      <ToastContainer />
+
       <style jsx>{`
         .animate-fadeUp {
           animation: fadeUp 0.9s ease-out both;
         }
         @keyframes fadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.97);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
+          from { opacity: 0; transform: translateY(20px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .animate-spinSlow {
-          animation: spinSlow 8s linear infinite;
-        }
+        .animate-spinSlow { animation: spinSlow 8s linear infinite; }
         @keyframes spinSlow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
         }
-        .animate-glowText {
-          animation: glowText 3s ease-in-out infinite;
-        }
+        .animate-glowText { animation: glowText 3s ease-in-out infinite; }
         @keyframes glowText {
-          0%,
-          100% {
-            text-shadow: 0 0 0px rgba(99, 102, 241, 0);
-          }
-          50% {
-            text-shadow: 0 4px 22px rgba(99, 102, 241, 0.45);
-          }
+          0%, 100% { text-shadow: 0 0 0px rgba(99,102,241,0); }
+          50%       { text-shadow: 0 4px 22px rgba(99,102,241,0.45); }
         }
         .aurora {
-          position: absolute;
-          width: 45vmax;
-          height: 45vmax;
-          border-radius: 9999px;
-          filter: blur(70px);
-          opacity: 0.25;
-          mix-blend-mode: screen;
+          position: absolute; width: 45vmax; height: 45vmax;
+          border-radius: 9999px; filter: blur(70px);
+          opacity: 0.25; mix-blend-mode: screen;
         }
         .aurora1 {
           background: radial-gradient(closest-side, #60a5fa, transparent 70%);
-          top: -10%;
-          left: -10%;
+          top: -10%; left: -10%;
           animation: float1 14s ease-in-out infinite;
         }
         .aurora2 {
           background: radial-gradient(closest-side, #a78bfa, transparent 70%);
-          top: 10%;
-          right: -15%;
+          top: 10%; right: -15%;
           animation: float2 16s ease-in-out infinite;
         }
         .aurora3 {
           background: radial-gradient(closest-side, #22d3ee, transparent 70%);
-          bottom: -20%;
-          left: 20%;
+          bottom: -20%; left: 20%;
           animation: float3 18s ease-in-out infinite;
         }
         @keyframes float1 {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-          50% {
-            transform: translate3d(6%, 8%, 0) scale(1.05);
-          }
+          0%, 100% { transform: translate3d(0,0,0) scale(1); }
+          50%       { transform: translate3d(6%,8%,0) scale(1.05); }
         }
         @keyframes float2 {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-          50% {
-            transform: translate3d(-5%, 6%, 0) scale(1.08);
-          }
+          0%, 100% { transform: translate3d(0,0,0) scale(1); }
+          50%       { transform: translate3d(-5%,6%,0) scale(1.08); }
         }
         @keyframes float3 {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-          50% {
-            transform: translate3d(4%, -6%, 0) scale(1.03);
-          }
+          0%, 100% { transform: translate3d(0,0,0) scale(1); }
+          50%       { transform: translate3d(4%,-6%,0) scale(1.03); }
         }
         .star {
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background: white;
-          border-radius: 9999px;
-          opacity: 0.5;
+          position: absolute; width: 2px; height: 2px;
+          background: white; border-radius: 9999px; opacity: 0.5;
           animation: twinkle 3.2s ease-in-out infinite;
-          box-shadow:
-            0 0 6px rgba(255, 255, 255, 0.6),
-            0 0 14px rgba(99, 102, 241, 0.35);
+          box-shadow: 0 0 6px rgba(255,255,255,0.6), 0 0 14px rgba(99,102,241,0.35);
         }
         @keyframes twinkle {
-          0%,
-          100% {
-            opacity: 0.2;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.7);
-          }
+          0%, 100% { opacity: 0.2; transform: scale(1); }
+          50%       { opacity: 1;   transform: scale(1.7); }
         }
         .shine {
-          pointer-events: none;
-          position: absolute;
-          inset: 0;
+          pointer-events: none; position: absolute; inset: 0;
           transform: translateX(-120%);
-          background: linear-gradient(
-            120deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.3) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          mix-blend-mode: screen;
-          transition: transform 0.7s ease;
+          background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+          mix-blend-mode: screen; transition: transform 0.7s ease;
         }
-        button:hover .shine {
-          transform: translateX(120%);
-        }
+        button:hover .shine { transform: translateX(120%); }
       `}</style>
     </>
   );

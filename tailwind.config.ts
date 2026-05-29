@@ -12,6 +12,7 @@ const config: Config = {
   plugins: [
     // Iconify plugin - enables icon-[collection--name] class syntax
     addDynamicIconSelectors(),
+    require("daisyui")
   ],
 };
 

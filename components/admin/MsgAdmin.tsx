@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import WindowFloat from "../ui/WindowFloat";
+import { toast } from "../ui/Toast";
 
 interface Message {
   ID: string;
@@ -33,7 +34,6 @@ function ViewModal({ message, onClose }: { message: Message; onClose: () => void
             <button onClick={onClose} className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400" />
           </div>
           <div className="flex flex-col gap-4 p-5" style={{ direction: "ltr" }}>
-            {/* Name */}
             <div className="flex flex-row items-start gap-2">
               <span className="icon-[mdi--account] w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
               <div className="flex flex-col flex-1">
@@ -41,7 +41,6 @@ function ViewModal({ message, onClose }: { message: Message; onClose: () => void
                 <span className="text-gray-400 font-medium text-sm">{message.Name}</span>
               </div>
             </div>
-            {/* Email */}
             <div className="flex flex-row items-start gap-2">
               <span className="icon-[mdi--email] w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
               <div className="flex flex-col flex-1">
@@ -49,7 +48,6 @@ function ViewModal({ message, onClose }: { message: Message; onClose: () => void
                 <span className="text-gray-400 text-sm">{message.Email}</span>
               </div>
             </div>
-            {/* Date */}
             <div className="flex flex-row items-start gap-2">
               <span className="icon-[mdi--calendar] w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
               <div className="flex flex-col flex-1">
@@ -57,7 +55,6 @@ function ViewModal({ message, onClose }: { message: Message; onClose: () => void
                 <span className="text-gray-400 text-sm">{message.Date}</span>
               </div>
             </div>
-            {/* Message */}
             <div className="flex flex-col gap-2 mt-1">
               <div className="flex flex-row items-center gap-2">
                 <span className="icon-[mdi--message-text] w-5 h-5 text-orange-500" />
@@ -116,29 +113,39 @@ export default function AdminMessagesManagement({ onClose, onMinimize, onBack }:
   const [loading, setLoading]   = useState(true);
   const [modal, setModal]       = useState<"view" | "delete" | null>(null);
   const [selected, setSelected] = useState<Message | null>(null);
-  const [toast, setToast]       = useState("");
-
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   async function load() {
     try {
       const res  = await fetch("/api/system/showMsg?p=mdms");
       const data = await res.json();
       if (data.data) setMessages(data.data);
-    } catch { } finally { setLoading(false); }
+    } catch {
+      toast.error("Failed to load messages");
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []);
 
   async function handleDelete() {
     if (!selected) return;
-    const res  = await fetch("/api/system/removeMsg", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: selected.ID }),
-    });
-    const data = await res.json();
-    if (data.success) { showToast("Message deleted!"); load(); }
+    try {
+      const res  = await fetch("/api/system/removeMsg", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selected.ID }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Message deleted successfully!");
+        load();
+      } else {
+        toast.error(data.msg || "Failed to delete message");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    }
     setModal(null);
   }
 
@@ -185,7 +192,6 @@ export default function AdminMessagesManagement({ onClose, onMinimize, onBack }:
                 className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 hover:border-white/20 transition-all"
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5">
-                  {/* Avatar + info */}
                   <div className="flex flex-row items-center gap-3 sm:gap-4 flex-1 min-w-0">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
                       <span className="icon-[mdi--account] w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -203,7 +209,6 @@ export default function AdminMessagesManagement({ onClose, onMinimize, onBack }:
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                     <button
                       onClick={() => { setSelected(message); setModal("view"); }}
@@ -227,12 +232,6 @@ export default function AdminMessagesManagement({ onClose, onMinimize, onBack }:
 
       {modal === "view"   && selected && <ViewModal    message={selected} onClose={() => setModal(null)} />}
       {modal === "delete" &&             <ConfirmModal onConfirm={handleDelete} onClose={() => setModal(null)} />}
-
-      {toast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[1200] bg-green-600 text-white px-5 py-2 rounded-full text-sm font-mono shadow-xl">
-          {toast}
-        </div>
-      )}
     </>
   );
 }

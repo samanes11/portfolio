@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import WindowFloat from "../ui/WindowFloat";
+import { toast } from "../ui/Toast";
 
 interface Project {
   id: string;
@@ -18,7 +19,7 @@ interface Props {
   onBack: () => void;
 }
 
-// ── Reusable modal ──────────────────────────────────────────────────────────
+// ── Form Field ────────────────────────────────────────────────────────────────
 
 function FormField({ label, value, onChange, placeholder, disabled, type = "text" }: {
   label: string; value: string; onChange?: (v: string) => void;
@@ -38,7 +39,7 @@ function FormField({ label, value, onChange, placeholder, disabled, type = "text
   );
 }
 
-// ── Add / Edit modal ─────────────────────────────────────────────────────────
+// ── Add / Edit modal ──────────────────────────────────────────────────────────
 
 function ProjectModal({ initial, onSave, onClose }: {
   initial?: Project | null;
@@ -55,16 +56,23 @@ function ProjectModal({ initial, onSave, onClose }: {
     desc:     initial?.desc     ?? "",
   });
   const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   async function submit() {
-    if (!form.id || !form.name) { setErr("ID and Name are required"); return; }
+    if (!form.id || !form.name) {
+      toast.error("ID and Name are required");
+      return;
+    }
     setSaving(true);
-    try { await onSave(form); onClose(); }
-    catch (e: any) { setErr(e?.message ?? "Error"); }
-    finally { setSaving(false); }
+    try {
+      await onSave(form);
+      onClose();
+    } catch (e: any) {
+      toast.error(e?.message ?? "An error occurred");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -72,7 +80,6 @@ function ProjectModal({ initial, onSave, onClose }: {
       <div className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-[1101] flex items-center justify-center p-4">
         <div className="w-full max-w-sm rounded-2xl shadow-2xl border border-white/10 overflow-hidden" style={{ background: "linear-gradient(135deg,#1e1e2c,#232838)" }}>
-          {/* title bar */}
           <div className="flex items-center justify-between px-4 py-2 bg-black/30 border-b border-white/10">
             <span className="text-white/70 text-xs font-mono">{isEdit ? "Edit Project" : "Add New Project"}</span>
             <button onClick={onClose} className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400" />
@@ -92,7 +99,6 @@ function ProjectModal({ initial, onSave, onClose }: {
                 style={{ background: "rgba(255,255,255,0.05)" }}
               />
             </div>
-            {err && <span className="text-red-400 text-xs">{err}</span>}
             <div className="flex gap-3">
               <button onClick={onClose} className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors">Cancel</button>
               <button onClick={submit} disabled={saving} className="flex-1 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-mono font-bold transition-colors disabled:opacity-50">
@@ -106,7 +112,7 @@ function ProjectModal({ initial, onSave, onClose }: {
   );
 }
 
-// ── Confirm delete modal ─────────────────────────────────────────────────────
+// ── Confirm delete modal ──────────────────────────────────────────────────────
 
 function ConfirmModal({ onConfirm, onClose }: { onConfirm: () => void; onClose: () => void }) {
   return (
@@ -130,23 +136,24 @@ function ConfirmModal({ onConfirm, onClose }: { onConfirm: () => void; onClose: 
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+// ── Main component ────────────────────────────────────────────────────────────
 
 export default function AdminProjectManagement({ onClose, onMinimize, onBack }: Props) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<"add" | "edit" | "delete" | null>(null);
   const [selected, setSelected] = useState<Project | null>(null);
-  const [toast, setToast] = useState("");
-
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   async function load() {
     try {
       const res = await fetch("/api/system/showProject?p=cs");
       const data = await res.json();
       if (data.data) setProjects(data.data);
-    } catch { } finally { setLoading(false); }
+    } catch {
+      toast.error("Failed to load projects");
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []);
@@ -160,19 +167,28 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.msg || "Failed");
-    showToast(isEdit ? "Project updated!" : "Project added!");
+    toast.success(isEdit ? "Project updated successfully!" : "Project added successfully!");
     load();
   }
 
   async function handleDelete() {
     if (!selected) return;
-    const res = await fetch("/api/system/removeProject", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: selected.id }),
-    });
-    const data = await res.json();
-    if (data.success) { showToast("Project deleted!"); load(); }
+    try {
+      const res = await fetch("/api/system/removeProject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selected.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Project deleted successfully!");
+        load();
+      } else {
+        toast.error(data.msg || "Failed to delete project");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
+    }
     setModal(null);
   }
 
@@ -243,18 +259,10 @@ export default function AdminProjectManagement({ onClose, onMinimize, onBack }: 
         </div>
       </WindowFloat>
 
-      {/* Modals */}
       {(modal === "add" || modal === "edit") && (
         <ProjectModal initial={modal === "edit" ? selected : null} onSave={handleSave} onClose={() => setModal(null)} />
       )}
       {modal === "delete" && <ConfirmModal onConfirm={handleDelete} onClose={() => setModal(null)} />}
-
-      {/* Toast */}
-      {toast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[1200] bg-green-600 text-white px-5 py-2 rounded-full text-sm font-mono shadow-xl">
-          {toast}
-        </div>
-      )}
     </>
   );
 }
