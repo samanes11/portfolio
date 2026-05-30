@@ -42,7 +42,7 @@ export default function Taskbar({
   currentTime,
 }: TaskbarProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-14 flex items-center bg-gray-900/80 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] px-3 gap-3 z-[999]">
+    <div className="fixed bottom-0 left-0 right-0 h-14 flex items-center bg-transparent/50 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] px-3 gap-3 z-[999]">
       {/* Start Button */}
       <button
         className="group relative h-8 w-8 rounded-xl bg-gradient-to-br from-amber-700 to-amber-800 hover:from-amber-900 hover:to-amber-500 shadow-lg hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"

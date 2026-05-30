@@ -125,19 +125,49 @@ const recentApps = [
 
 export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
   const [recentOpen, setRecentOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => onClose(), 180);
+  };
+
+  const handleItemClick = (id: string) => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      onItemClick(id);
+    }, 180);
+  };
+
   return (
     <>
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-[1000] bg-black/20 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Menu */}
       <div
         className="fixed bottom-16 left-3 right-3 sm:left-3 sm:right-auto sm:w-[400px] max-w-3xl bg-gradient-to-br from-gray-800/95 via-amber-950/95 to-stone-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-900/30 z-[1001] overflow-hidden"
-        style={{ direction: "ltr" }}
+        style={{
+          direction: "ltr",
+          animation: isClosing
+            ? "startMenuOut 0.18s ease forwards"
+            : "startMenuIn 0.2s ease forwards",
+        }}
       >
+        <style>{`
+          @keyframes startMenuIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)   scale(1);    }
+          }
+          @keyframes startMenuOut {
+            from { opacity: 1; transform: translateY(0)   scale(1);    }
+            to   { opacity: 0; transform: translateY(10px) scale(0.97); }
+          }
+        `}</style>
         {/* Profile */}
         <div className="bg-gradient-to-r from-amber-900/80 to-stone-800/80 px-6 py-4 border-b border-amber-900/30 flex items-center gap-4">
           <Image
@@ -162,7 +192,7 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
               <div
                 key={item.id}
                 className="group flex items-center gap-3 px-3 py-2.5 hover:bg-white/10 cursor-pointer transition-all duration-300 rounded-lg"
-                onClick={() => onItemClick(item.id)}
+                onClick={() => handleItemClick(item.id)}
               >
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-yellow-500/20 text-white group-hover:from-yellow-500 group-hover:to-amber-500 transition-all duration-300 shadow-lg group-hover:scale-105 flex items-center justify-center flex-shrink-0">
                   <span className={`${item.icon} w-[22px] h-[22px]`} />
@@ -194,7 +224,7 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
             {/* Game */}
             <div
               className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 cursor-pointer transition-all duration-300 rounded-lg group"
-              onClick={() => onItemClick("game")}
+              onClick={() => handleItemClick("game")}
             >
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-purple-400 group-hover:from-purple-500 group-hover:to-pink-500 group-hover:text-white transition-all duration-300 flex items-center justify-center">
                 <span className="icon-[solar--gameboy-bold] w-[20px] h-[20px]" />
@@ -207,7 +237,7 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
             {/* Media Player */}
             <div
               className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 cursor-pointer transition-all duration-300 rounded-lg group"
-              onClick={() => onItemClick("mediaplayer")}
+              onClick={() => handleItemClick("mediaplayer")}
             >
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-800 to-orange-500/20 text-red-400 group-hover:from-red-700 group-hover:to-orange-500 group-hover:text-white transition-all duration-300 flex items-center justify-center">
                 <span className="icon-[material-symbols-light--smart-display] w-[20px] h-[20px]" />
@@ -250,25 +280,33 @@ export default function StartMenu({ onItemClick, onClose }: StartMenuProps) {
         <div className="px-3 pb-2">
           <div className="border-t border-white/10 pt-2">
             <div className="relative">
-              {recentOpen && (
-                <div className="absolute bottom-full mb-1 left-0 bg-gradient-to-br from-amber-950/98 to-stone-900/98 backdrop-blur-xl rounded-xl w-[180px] p-1 shadow-xl border border-amber-900/30 z-10">
-                  {recentApps.map((app, i) => (
+              <div
+                className="absolute bottom-full mb-1 left-0 bg-gradient-to-br from-amber-950/98 to-stone-900/98 backdrop-blur-xl rounded-xl w-[180px] p-1 shadow-xl border border-amber-900/30 z-10 overflow-hidden"
+                style={{
+                  maxHeight: recentOpen ? `${recentApps.length * 44}px` : "0px",
+                  opacity: recentOpen ? 1 : 0,
+                  transform: recentOpen ? "translateY(0) scaleY(1)" : "translateY(6px) scaleY(0.96)",
+                  transformOrigin: "bottom",
+                  transition: "max-height 0.25s ease, opacity 0.2s ease, transform 0.2s ease",
+                  pointerEvents: recentOpen ? "auto" : "none",
+                }}
+              >
+                {recentApps.map((app, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 px-3 py-2 cursor-not-allowed"
+                  >
                     <div
-                      key={i}
-                      className="flex items-center gap-3 px-3 py-2 cursor-not-allowed"
+                      className={`w-6 h-6 rounded-lg bg-gradient-to-br ${app.color} shadow-lg flex items-center justify-center`}
                     >
-                      <div
-                        className={`w-6 h-6 rounded-lg bg-gradient-to-br ${app.color} shadow-lg flex items-center justify-center`}
-                      >
-                        <span className={`${app.icon} w-4 h-4 text-white`} />
-                      </div>
-                      <span className="text-gray-300" style={{ fontSize: 10 }}>
-                        {app.name}
-                      </span>
+                      <span className={`${app.icon} w-4 h-4 text-white`} />
                     </div>
-                  ))}
-                </div>
-              )}
+                    <span className="text-gray-300" style={{ fontSize: 10 }}>
+                      {app.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
               <button
                 onClick={() => setRecentOpen((o) => !o)}
                 className="flex items-center justify-between px-4 py-2 hover:bg-white/10 cursor-pointer transition-all duration-300 rounded-xl w-[180px]"
