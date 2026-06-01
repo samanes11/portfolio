@@ -7,6 +7,7 @@ interface TaskbarProps {
   minimizedWindows: string[];
   activeWindow: string | null;
   onOpenWindow: (id: string) => void;
+  onCloseWindow?: (id: string) => void;
   onToggleStart: () => void;
   currentTime: string;
 }
@@ -38,6 +39,7 @@ export default function Taskbar({
   minimizedWindows,
   activeWindow,
   onOpenWindow,
+  onCloseWindow,
   onToggleStart,
   currentTime,
 }: TaskbarProps) {
@@ -60,37 +62,53 @@ export default function Taskbar({
           const isActive = windowId === activeWindow;
           const isMinimized = minimizedWindows.includes(windowId);
           return (
-            <button
+            <div
               key={windowId}
-              onClick={() => onOpenWindow(windowId)}
-              className={`group relative h-10 px-4 rounded-lg backdrop-blur-sm border text-white flex items-center gap-2 transition-all duration-300 hover:scale-105 whitespace-nowrap shadow-lg ${
+              className={`group relative h-10 pl-3 pr-1.5 rounded-lg backdrop-blur-sm border text-white flex items-center gap-2 transition-all duration-300 whitespace-nowrap shadow-lg ${
                 isActive
                   ? "bg-red-900/30 border-yellow-700/50"
                   : "bg-white/10 border-white/10 hover:bg-white/20"
               }`}
             >
-              <div
-                className={`w-1.5 h-1.5 rounded-full ${
-                  isActive
-                    ? "bg-yellow-500 animate-pulse"
-                    : isMinimized
-                      ? "bg-gray-600"
-                      : "bg-gray-400"
-                }`}
-              />
-              {windowIcons[windowId] && (
-                <span
-                  className={`${windowIcons[windowId]} w-[18px] h-[18px] ${isMinimized ? "opacity-50" : ""}`}
-                />
-              )}
-              <span
-                style={{ fontSize: 12 }}
-                className={`font-medium ${isMinimized ? "opacity-50" : ""}`}
+              <button
+                onClick={() => onOpenWindow(windowId)}
+                className="flex items-center gap-2 flex-1 min-w-0"
               >
-                {windowLabels[windowId] ??
-                  windowId.charAt(0).toUpperCase() + windowId.slice(1)}
-              </span>
-            </button>
+                <div
+                  className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                    isActive
+                      ? "bg-yellow-500 animate-pulse"
+                      : isMinimized
+                        ? "bg-gray-600"
+                        : "bg-gray-400"
+                  }`}
+                />
+                {windowIcons[windowId] && (
+                  <span
+                    className={`${windowIcons[windowId]} w-[18px] h-[18px] flex-shrink-0 ${isMinimized ? "opacity-50" : ""}`}
+                  />
+                )}
+                <span
+                  style={{ fontSize: 12 }}
+                  className={`font-medium ${isMinimized ? "opacity-50" : ""}`}
+                >
+                  {windowLabels[windowId] ??
+                    windowId.charAt(0).toUpperCase() + windowId.slice(1)}
+                </span>
+              </button>
+              {onCloseWindow && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCloseWindow(windowId);
+                  }}
+                  className="ml-1 w-4 h-4 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-400/70 transition-all duration-150 flex-shrink-0"
+                  title="Close"
+                >
+                  <span className="icon-[mdi--close] w-[10px] h-[10px] text-white" />
+                </button>
+              )}
+            </div>
           );
         })}
       </div>

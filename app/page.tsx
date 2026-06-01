@@ -266,6 +266,7 @@ export default function PortfolioPage() {
         minimizedWindows={minimizedWindows}
         activeWindow={activeWindow}
         onOpenWindow={handleTaskbarClick}
+        onCloseWindow={(id) => closeWindow(id as WindowId)}
         onToggleStart={() => setStartMenuOpen((o) => !o)}
         currentTime={currentTime}
       />
