@@ -16,6 +16,8 @@ interface WindowFloatProps {
 let globalZ = 901;
 const getNextZ = () => ++globalZ;
 
+const activeWindows: Array<() => void> = [];
+
 export default function WindowFloat({
   onclose,
   onminimize,
@@ -25,46 +27,65 @@ export default function WindowFloat({
   contentStyle = {},
   title,
 }: WindowFloatProps) {
-  const overlayRef  = useRef<HTMLDivElement>(null);
-  const windowRef   = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
 
   const [phase, setPhase] = useState<"open" | "closing" | "minimizing">("open");
-  const [minimizeTarget, setMinimizeTarget] = useState<{ x: number; y: number } | null>(null);
-  const [pos, setPos]     = useState<{ x: number; y: number } | null>(null);
+  const [minimizeTarget, setMinimizeTarget] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [zIndex, setZIndex] = useState(() => getNextZ());
+  const [mounted, setMounted] = useState(false);
 
-  const dragging   = useRef(false);
+  const dragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
-
-  const bringToFront = useCallback(() => {
-    setZIndex(getNextZ());
-  }, []);
+  const handleCloseRef = useRef<() => void>(null!);
 
   const handleClose = useCallback(() => {
     setPhase("closing");
     setTimeout(() => onclose(), 220);
   }, [onclose]);
 
+  handleCloseRef.current = handleClose;
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 320);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const fn = () => handleCloseRef.current();
+    activeWindows.push(fn);
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const top = activeWindows[activeWindows.length - 1];
+      if (top === fn) fn();
+    };
+    window.addEventListener("keydown", handler);
+
+    return () => {
+      window.removeEventListener("keydown", handler);
+      const idx = activeWindows.lastIndexOf(fn);
+      if (idx !== -1) activeWindows.splice(idx, 1);
+    };
+  }, []);
+
+  const bringToFront = useCallback(() => setZIndex(getNextZ()), []);
+
   const handleMinimize = useCallback(() => {
-    // Calculate where the window should fly to (taskbar bottom-left area)
     const rect = windowRef.current?.getBoundingClientRect();
     if (rect) {
-      const taskbarY = window.innerHeight - 56; // taskbar height ~56px
-      const targetX  = 60; // approximate taskbar icon area
-      const targetY  = taskbarY;
-      setMinimizeTarget({ x: targetX - rect.left, y: targetY - rect.top });
+      setMinimizeTarget({
+        x: 60 - rect.left,
+        y: window.innerHeight - 56 - rect.top,
+      });
     }
     setPhase("minimizing");
     setTimeout(() => onminimize?.(), 320);
   }, [onminimize]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [handleClose]);
 
   // Mouse drag
   const onTitleMouseDown = useCallback(
@@ -74,7 +95,7 @@ export default function WindowFloat({
       bringToFront();
       dragging.current = true;
 
-      const rect     = windowRef.current!.getBoundingClientRect();
+      const rect = windowRef.current!.getBoundingClientRect();
       const currentX = pos?.x ?? rect.left;
       const currentY = pos?.y ?? rect.top;
 
@@ -87,10 +108,16 @@ export default function WindowFloat({
         if (!dragging.current) return;
         const winW = window.innerWidth;
         const winH = window.innerHeight;
-        const w    = windowRef.current?.offsetWidth  ?? 400;
-        const h    = windowRef.current?.offsetHeight ?? 300;
-        const x = Math.min(Math.max(ev.clientX - dragOffset.current.x, 0), winW - w);
-        const y = Math.min(Math.max(ev.clientY - dragOffset.current.y, 0), winH - h - 56);
+        const w = windowRef.current?.offsetWidth ?? 400;
+        const h = windowRef.current?.offsetHeight ?? 300;
+        const x = Math.min(
+          Math.max(ev.clientX - dragOffset.current.x, 0),
+          winW - w,
+        );
+        const y = Math.min(
+          Math.max(ev.clientY - dragOffset.current.y, 0),
+          winH - h - 56,
+        );
         setPos({ x, y });
       };
 
@@ -103,18 +130,18 @@ export default function WindowFloat({
       window.addEventListener("mousemove", onMouseMove);
       window.addEventListener("mouseup", onMouseUp);
     },
-    [pos, bringToFront]
+    [pos, bringToFront],
   );
 
-  // Touch drag 
+  // Touch drag
   const onTitleTouchStart = useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
       if ((e.target as HTMLElement).closest("button")) return;
       bringToFront();
       dragging.current = true;
 
-      const touch    = e.touches[0];
-      const rect     = windowRef.current!.getBoundingClientRect();
+      const touch = e.touches[0];
+      const rect = windowRef.current!.getBoundingClientRect();
       const currentX = pos?.x ?? rect.left;
       const currentY = pos?.y ?? rect.top;
 
@@ -126,13 +153,19 @@ export default function WindowFloat({
       const onTouchMove = (ev: TouchEvent) => {
         if (!dragging.current) return;
         ev.preventDefault();
-        const t    = ev.touches[0];
+        const t = ev.touches[0];
         const winW = window.innerWidth;
         const winH = window.innerHeight;
-        const w    = windowRef.current?.offsetWidth  ?? 400;
-        const h    = windowRef.current?.offsetHeight ?? 300;
-        const x = Math.min(Math.max(t.clientX - dragOffset.current.x, 0), winW - w);
-        const y = Math.min(Math.max(t.clientY - dragOffset.current.y, 0), winH - h - 56);
+        const w = windowRef.current?.offsetWidth ?? 400;
+        const h = windowRef.current?.offsetHeight ?? 300;
+        const x = Math.min(
+          Math.max(t.clientX - dragOffset.current.x, 0),
+          winW - w,
+        );
+        const y = Math.min(
+          Math.max(t.clientY - dragOffset.current.y, 0),
+          winH - h - 56,
+        );
         setPos({ x, y });
       };
 
@@ -145,23 +178,29 @@ export default function WindowFloat({
       window.addEventListener("touchmove", onTouchMove, { passive: false });
       window.addEventListener("touchend", onTouchEnd);
     },
-    [pos, bringToFront]
+    [pos, bringToFront],
   );
 
-  const isClosing    = phase === "closing";
+  const isClosing = phase === "closing";
   const isMinimizing = phase === "minimizing";
 
   // CSS custom properties for the minimize target offset
-  const minimizeCSSVars = isMinimizing && minimizeTarget
-    ? ({
-        "--wf-min-x": `${minimizeTarget.x}px`,
-        "--wf-min-y": `${minimizeTarget.y}px`,
-      } as React.CSSProperties)
-    : {};
+  const minimizeCSSVars =
+    isMinimizing && minimizeTarget
+      ? ({
+          "--wf-min-x": `${minimizeTarget.x}px`,
+          "--wf-min-y": `${minimizeTarget.y}px`,
+        } as React.CSSProperties)
+      : {};
 
   const posStyle: React.CSSProperties = pos
     ? { position: "fixed", left: pos.x, top: pos.y, transform: "none" }
-    : { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+    : {
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      };
 
   return (
     <>
@@ -228,7 +267,8 @@ export default function WindowFloat({
           width: "100%",
           maxWidth,
           maxHeight: "90vh",
-          boxShadow: "0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)",
+          boxShadow:
+            "0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)",
           transformOrigin: "bottom center",
           animation: isMinimizing
             ? pos
