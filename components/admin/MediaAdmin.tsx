@@ -308,7 +308,6 @@ export default function AdminMediaManagement({
       <WindowFloat
         onclose={onClose}
         onminimize={onMinimize}
-        showMinimize
         padding={0}
         maxWidth="140vh"
         title="Media Management"

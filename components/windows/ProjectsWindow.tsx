@@ -54,7 +54,6 @@ export default function ProjectsWindow({
     return (
       <WindowFloat
         onclose={() => setPreviewMedia(null)}
-        showMinimize={false}
         maxWidth="700px"
         title="Media Preview"
         contentStyle={{ background: "linear-gradient(135deg, #0f0f0f, #1a1a1a)" }}
@@ -104,7 +103,6 @@ export default function ProjectsWindow({
       <WindowFloat
         onclose={onClose}
         onminimize={onMinimize}
-        showMinimize
         maxWidth="120vh"
         title={project.name}
         contentStyle={{ background: "#2d2d2d" }}
@@ -169,7 +167,6 @@ export default function ProjectsWindow({
     <WindowFloat
       onclose={onClose}
       onminimize={onMinimize}
-      showMinimize
       maxWidth="120vh"
       title="Projects"
       contentStyle={{ background: "#2d2d2d" }}

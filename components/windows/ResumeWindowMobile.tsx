@@ -30,7 +30,6 @@ export default function ResumeWindowMobile({
     <WindowFloat
       onclose={onClose}
       onminimize={onMinimize}
-      showMinimize
       padding={20}
       maxWidth="80vh"
       title="Resume"

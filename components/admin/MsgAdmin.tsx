@@ -199,7 +199,6 @@ export default function AdminMessagesManagement({
       <WindowFloat
         onclose={onClose}
         onminimize={onMinimize}
-        showMinimize
         padding={0}
         maxWidth="90vh"
         title="Messages Management"

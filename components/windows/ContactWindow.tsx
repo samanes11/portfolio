@@ -45,7 +45,6 @@ export default function ContactWindow({ onClose, onMinimize }: ContactWindowProp
     <WindowFloat
       onclose={onClose}
       onminimize={onMinimize}
-      showMinimize
       padding={20}
       maxWidth="40vh"
       title="Contact"

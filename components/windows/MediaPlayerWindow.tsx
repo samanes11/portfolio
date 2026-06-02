@@ -58,7 +58,6 @@ export default function MediaPlayerWindow({
       <WindowFloat
         onclose={onClose}
         onminimize={onMinimize}
-        showMinimize
         padding={0}
         maxWidth="160vh"
         title={img.title}
@@ -94,7 +93,6 @@ export default function MediaPlayerWindow({
     <WindowFloat
       onclose={onClose}
       onminimize={onMinimize}
-      showMinimize
       maxWidth="120vh"
       title="Media Player"
       contentStyle={{

@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 interface WindowFloatProps {
   onclose: () => void;
   onminimize?: () => void;
-  showMinimize?: boolean;
   children: React.ReactNode;
   maxWidth?: string;
   padding?: number;
@@ -20,7 +19,6 @@ const getNextZ = () => ++globalZ;
 export default function WindowFloat({
   onclose,
   onminimize,
-  showMinimize = false,
   children,
   maxWidth = "600px",
   padding = 16,
@@ -256,7 +254,7 @@ export default function WindowFloat({
             {title ?? "window"}
           </span>
           <div className="flex items-center gap-2">
-            {showMinimize && onminimize && (
+            {onminimize && (
               <button
                 onClick={handleMinimize}
                 className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-300 transition-colors"

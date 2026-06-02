@@ -13,7 +13,6 @@ export default function ResumeWindowPC({ onClose, onMinimize }: ResumeWindowPCPr
     <WindowFloat
       onclose={onClose}
       onminimize={onMinimize}
-      showMinimize
       padding={0}
       maxWidth="900px"
       title="Resume"

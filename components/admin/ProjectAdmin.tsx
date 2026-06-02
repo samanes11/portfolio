@@ -293,7 +293,6 @@ export default function AdminProjectManagement({
       <WindowFloat
         onclose={onClose}
         onminimize={onMinimize}
-        showMinimize
         padding={0}
         maxWidth="140vh"
         title="Project Management"
