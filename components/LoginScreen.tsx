@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ToastContainer, toast } from "./ui/Toast";
+import WindowFloat from "./ui/WindowFloat";
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -139,80 +140,63 @@ export default function LoginScreen({
         </div>
       </div>
 
-      {/* Admin Password Modal */}
+      {/* Admin Password */}
       {showAdminModal && (
-        <>
-          <div
-            className="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm"
-            onClick={closeModal}
-          />
-          <div className="fixed inset-0 z-[1001] flex items-center justify-center">
-            <div
-              className="rounded-2xl shadow-2xl border border-white/10 overflow-hidden w-[300px]"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(134,137,143,0.82), rgba(35,29,49,0.82))",
-                backdropFilter: "blur(20px)",
-              }}
-            >
-              {/* modal titlebar */}
-              <div className="flex items-center justify-between px-4 py-2 bg-black/30 border-b border-white/10">
-                <span className="text-white/70 text-xs font-mono">
-                  admin login
-                </span>
-                <button
-                  onClick={closeModal}
-                  className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400"
+        <div className="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm">
+          <WindowFloat
+            onclose={closeModal}
+            title="admin login"
+            maxWidth="300px"
+            padding={20}
+            contentStyle={{
+              background:
+                "linear-gradient(135deg, rgba(134,137,143,0.95), rgba(35,29,49,0.95))",
+              backdropFilter: "blur(20px)",
+            }}
+          >
+            <div className="flex flex-col items-center gap-5" style={{ direction: "ltr" }}>
+              <div className="w-full flex flex-col gap-1">
+                <label className="text-white/70 text-xs font-mono mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAdminSubmit()}
+                  className="w-full rounded-lg px-3 py-2 text-sm font-mono outline-none border border-white/20 focus:border-amber-500/60 transition-colors"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(134,137,143,0.4), rgba(35,29,49,0.4))",
+                    color: "white",
+                    fontWeight: 1000,
+                    fontSize: 13,
+                  }}
+                  autoFocus
+                  placeholder="Enter password..."
                 />
               </div>
 
-              <div
-                className="p-5 flex flex-col items-center gap-5"
-                style={{ direction: "ltr" }}
-              >
-                <div className="w-full flex flex-col gap-1">
-                  <label className="text-white/70 text-xs font-mono mb-1">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAdminSubmit()}
-                    className="w-full rounded-lg px-3 py-2 text-sm font-mono outline-none border border-white/20 focus:border-amber-500/60 transition-colors"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, rgba(134,137,143,0.4), rgba(35,29,49,0.4))",
-                      color: "white",
-                      fontWeight: 1000,
-                      fontSize: 13,
-                    }}
-                    autoFocus
-                    placeholder="Enter password..."
-                  />
-                </div>
-
-                <div className="flex gap-3 w-full">
-                  <button
-                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-mono font-bold transition-colors"
-                    onClick={handleAdminSubmit}
-                  >
-                    Login
-                  </button>
-                </div>
+              <div className="flex gap-3 w-full">
+                <button
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-mono font-bold transition-colors"
+                  onClick={handleAdminSubmit}
+                >
+                  Login
+                </button>
               </div>
             </div>
-          </div>
-        </>
+          </WindowFloat>
+        </div>
       )}
 
-      {/* Toast lives here for the login screen (before page.tsx mounts) */}
+      {/* Toast */}
       <ToastContainer />
 
       <style jsx>{`

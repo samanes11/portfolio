@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.error("showMsg error:", err);
     return NextResponse.json(
-      { success: false, msg: "خطا در دریافت پیام‌ها" },
+      { success: false, msg: "eroor connecting" },
       { status: 500 }
     );
   }

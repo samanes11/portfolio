@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.error("showMedia error:", err);
     return NextResponse.json(
-      { success: false, msg: "خطا در دریافت مدیا" },
+      { success: false, msg: "Connecting Error" },
       { status: 500 }
     );
   }

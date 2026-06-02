@@ -19,7 +19,7 @@ interface Props {
   onBack: () => void;
 }
 
-// Form Field
+// ── Form Field ────────────────────────────────────────────────────────────────
 
 function FormField({
   label,
@@ -27,33 +27,35 @@ function FormField({
   onChange,
   placeholder,
   disabled,
-  type = "text",
 }: {
   label: string;
   value: string;
   onChange?: (v: string) => void;
   placeholder?: string;
   disabled?: boolean;
-  type?: string;
 }) {
   return (
     <div className="flex flex-col gap-1 w-full">
       <label className="text-slate-400 font-bold text-sm">{label}</label>
       <input
-        type={type}
+        type="text"
         disabled={disabled}
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange?.(e.target.value)}
-        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-amber-500 transition-colors disabled:opacity-60"
-        style={{ color: "#A5ADB9", fontWeight: 700, fontSize: 13 }}
+        className="w-full rounded-lg border border-white/20 px-3 py-2 text-sm outline-none focus:border-amber-500 transition-colors disabled:opacity-60"
+        style={{
+          background: "rgba(255,255,255,0.05)",
+          color: "#A5ADB9",
+          fontWeight: 700,
+          fontSize: 13,
+        }}
       />
     </div>
   );
 }
 
-//Add / Edit modal 
-
+// Add / Edit Modal
 function ProjectModal({
   initial,
   onSave,
@@ -94,95 +96,83 @@ function ProjectModal({
   }
 
   return (
-    <>
-      <div
-        className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="fixed inset-0 z-[1101] flex items-center justify-center p-4">
-        <div
-          className="w-full max-w-sm rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
-          style={{ background: "linear-gradient(135deg,#1e1e2c,#232838)" }}
-        >
-          <div className="flex items-center justify-between px-4 py-2 bg-black/30 border-b border-white/10">
-            <span className="text-white/70 text-xs font-mono">
-              {isEdit ? "Edit Project" : "Add New Project"}
-            </span>
+    <div className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm">
+      <WindowFloat
+        onclose={onClose}
+        title={isEdit ? "Edit Project" : "Add New Project"}
+        maxWidth="380px"
+        padding={20}
+        contentStyle={{ background: "linear-gradient(135deg,#1e1e2c,#232838)" }}
+      >
+        <div className="flex flex-col gap-4" style={{ direction: "ltr" }}>
+          <FormField
+            label="ID"
+            value={form.id}
+            onChange={isEdit ? undefined : set("id")}
+            disabled={isEdit}
+            placeholder="menu"
+          />
+          <FormField
+            label="Name"
+            value={form.name}
+            onChange={set("name")}
+            placeholder="Coffee Shop Menu"
+          />
+          <FormField
+            label="Date"
+            value={form.date}
+            onChange={set("date")}
+            placeholder="2025"
+          />
+          <FormField
+            label="Platform"
+            value={form.platform}
+            onChange={set("platform")}
+            placeholder="Mobile"
+          />
+          <FormField
+            label="Tech"
+            value={form.tech}
+            onChange={set("tech")}
+            placeholder="Flutter, Dart"
+          />
+
+          <div className="flex flex-col gap-1">
+            <label className="text-gray-300 font-bold text-sm">
+              Description
+            </label>
+            <textarea
+              rows={4}
+              value={form.desc}
+              placeholder="Project description..."
+              onChange={(e) => setForm((f) => ({ ...f, desc: e.target.value }))}
+              className="w-full rounded-lg border border-white/20 px-3 py-2 text-sm outline-none focus:border-amber-500 resize-none text-gray-300"
+              style={{ background: "rgba(255,255,255,0.05)" }}
+            />
+          </div>
+
+          <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400"
-            />
-          </div>
-          <div className="flex flex-col gap-4 p-5" style={{ direction: "ltr" }}>
-            <FormField
-              label="ID"
-              value={form.id}
-              onChange={isEdit ? undefined : set("id")}
-              disabled={isEdit}
-              placeholder="menu"
-            />
-            <FormField
-              label="Name"
-              value={form.name}
-              onChange={set("name")}
-              placeholder="Coffee Shop Menu"
-            />
-            <FormField
-              label="Date"
-              value={form.date}
-              onChange={set("date")}
-              placeholder="2025"
-            />
-            <FormField
-              label="Platform"
-              value={form.platform}
-              onChange={set("platform")}
-              placeholder="Mobile"
-            />
-            <FormField
-              label="Tech"
-              value={form.tech}
-              onChange={set("tech")}
-              placeholder="Flutter, Dart"
-            />
-            <div className="flex flex-col gap-1">
-              <label className="text-gray-300 font-bold text-sm">
-                Description
-              </label>
-              <textarea
-                rows={4}
-                value={form.desc}
-                placeholder="Project description..."
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, desc: e.target.value }))
-                }
-                className="w-full rounded-lg border border-white/20 px-3 py-2 text-sm outline-none focus:border-amber-500 resize-none text-gray-300"
-                style={{ background: "rgba(255,255,255,0.05)" }}
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                className="btn btn-ghost flex-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submit}
-                disabled={saving}
-                className="btn btn-ghost flex-1 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-mono font-bold transition-colors disabled:opacity-50"
-              >
-                {saving ? "Saving..." : isEdit ? "Save Changes" : "Add Project"}
-              </button>
-            </div>
+              className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={submit}
+              disabled={saving}
+              className="flex-1 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-mono font-bold transition-colors disabled:opacity-50"
+            >
+              {saving ? "Saving..." : isEdit ? "Save Changes" : "Add Project"}
+            </button>
           </div>
         </div>
-      </div>
-    </>
+      </WindowFloat>
+    </div>
   );
 }
 
-// Confirm delete modal 
+// Confirm Delete Modal
 
 function ConfirmModal({
   onConfirm,
@@ -192,50 +182,46 @@ function ConfirmModal({
   onClose: () => void;
 }) {
   return (
-    <>
-      <div
-        className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="fixed inset-0 z-[1101] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm">
+      <WindowFloat
+        onclose={onClose}
+        title="Confirm Delete"
+        maxWidth="280px"
+        padding={20}
+        contentStyle={{ background: "#1e1e2c" }}
+      >
         <div
-          className="w-[250px] rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
-          style={{ background: "#1e1e2c" }}
+          className="flex flex-col items-center gap-4"
+          style={{ direction: "ltr" }}
         >
-          <div className="flex items-center justify-between px-4 py-2 bg-black/30 border-b border-white/10">
-            <span className="text-white/70 text-xs font-mono">
-              Confirm Delete
-            </span>
+          <span className="icon-[mdi--alert-circle] w-14 h-14 text-red-500" />
+          <p className="text-gray-300 text-center text-sm">
+            Are you sure you want to delete this project?
+          </p>
+          <p className="text-gray-500 text-center text-xs">
+            This action cannot be undone.
+          </p>
+          <div className="flex gap-3 w-full">
             <button
               onClick={onClose}
-              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400"
-            />
-          </div>
-          <div
-            className="flex flex-col items-center gap-4 p-5"
-            style={{ direction: "ltr" }}
-          >
-            <span className="icon-[mdi--alert-circle] w-14 h-14 text-red-500" />
-            <p className="text-gray-300 text-center text-sm">
-              Are you sure you want to delete this project?
-            </p>
-            <p className="text-gray-500 text-center text-xs">
-              This action cannot be undone.
-            </p>
+              className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-mono transition-colors"
+            >
+              Cancel
+            </button>
             <button
               onClick={onConfirm}
-              className="w-full py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono font-bold transition-colors"
+              className="flex-1 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono font-bold transition-colors"
             >
               Delete
             </button>
           </div>
         </div>
-      </div>
-    </>
+      </WindowFloat>
+    </div>
   );
 }
 
-// Main component 
+// Main Component
 
 export default function AdminProjectManagement({
   onClose,
@@ -355,6 +341,7 @@ export default function AdminProjectManagement({
                 <div className="w-8 h-8 border-4 border-gray-600 border-t-blue-500 rounded-full animate-spin" />
               </div>
             )}
+
             {!loading &&
               projects.map((project) => (
                 <div
