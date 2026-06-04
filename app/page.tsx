@@ -15,6 +15,7 @@ import GameWindow from "@/components/windows/GameWindow";
 import MediaPlayerWindow from "@/components/windows/MediaPlayerWindow";
 import ControlPanel from "@/components/admin/ControlPanel";
 import { ToastContainer } from "@/components/ui/Toast";
+import WeatherWindow from "@/components/windows/WeatherWindow";
 
 type WindowId =
   | "about"
@@ -24,7 +25,8 @@ type WindowId =
   | "game"
   | "mediaplayer"
   | "AI Terminal"
-  | "controlPanel";
+  | "controlPanel"
+  | "weather";
 
 const desktopIcons: { id: WindowId; icon: string; label: string }[] = [
   { id: "about", icon: "icon-[octicon--person-fill-24]", label: "About Me" },
@@ -240,6 +242,13 @@ export default function PortfolioPage() {
         <ControlPanel
           onClose={() => closeWindow("controlPanel")}
           onMinimize={() => minimizeWindow("controlPanel")}
+        />
+      )}
+
+      {openWindows.has("weather") && (
+        <WeatherWindow
+          onClose={() => closeWindow("weather")}
+          onMinimize={() => minimizeWindow("weather")}
         />
       )}
 

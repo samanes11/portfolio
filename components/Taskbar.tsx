@@ -21,6 +21,7 @@ const windowLabels: Record<string, string> = {
   mediaplayer: "Media Player",
   // "AI Terminal": "AI Terminal",
   controlPanel: "Control Panel",
+  weather: "Weather" 
 };
 
 const windowIcons: Record<string, string> = {
@@ -32,6 +33,7 @@ const windowIcons: Record<string, string> = {
   mediaplayer: "icon-[material-symbols-light--smart-display]",
   // "AI Terminal": "icon-[eos-icons--terminal]",
   controlPanel: "icon-[mdi--shield-account]",
+  weather: "icon-[mdi--weather-partly-cloudy]"
 };
 
 export default function Taskbar({

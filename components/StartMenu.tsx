@@ -83,6 +83,12 @@ const menuItems = [
   //   label: "AI Terminal",
   //   desc: "AI Assistant",
   // },
+  {
+    id: "weather",
+    icon: "icon-[mdi--weather-partly-cloudy]",
+    label: "Weather",
+    desc: "Fetch Weather",
+  },
 ];
 
 const recentApps = [

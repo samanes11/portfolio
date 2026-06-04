@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
       .sort({ _id: -1 })
       .toArray();
 
-    // تبدیل _id به string و حذف آن
     const data = projects.map(({ _id, ...rest }) => rest);
 
     return NextResponse.json({ success: true, data });
