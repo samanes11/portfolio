@@ -278,7 +278,7 @@ export default function Taskbar({
 
         {/* ── System Tray ── */}
         <div
-          className="flex items-center gap-1 px-2 py-1 rounded-xl flex-shrink-0"
+          className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-xl flex-shrink-0"
           style={{
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.07)",
